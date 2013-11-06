@@ -7,7 +7,7 @@ import play.libs.Json;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class MyUtils {
+public class JsonUtil {
 
 	/**
 	 * get true json
@@ -31,6 +31,13 @@ public class MyUtils {
 		return result;
 	}
 
+	/**
+	 * add a list as json value
+	 * 
+	 * @param key
+	 * @param strList
+	 * @return
+	 */
 	public static ObjectNode addList2Json(String key, ArrayList<String> strList) {
 		ObjectNode result = Json.newObject();
 		ArrayNode an = result.arrayNode();
@@ -42,4 +49,5 @@ public class MyUtils {
 		result.putArray(key).addAll(an);
 		return result;
 	}
+
 }

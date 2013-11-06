@@ -10,6 +10,9 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 #Ontology
 #show all classes name
-GET		/onto/all					controllers.Ontology.all()
+GET		/onto/all					controllers.MyOntology.all()
 #get specific properties
-GET    /onto                        controllers.Ontology.getProperties(classname)
+GET    /onto                        controllers.MyOntology.getProperties(classname)
+
+#MyIndividual
+POST   /indiv/add                   controllers.MyIndividual.addIndividual()

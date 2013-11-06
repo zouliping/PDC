@@ -38,7 +38,7 @@ public class MyOntModel {
 	 * @param name
 	 * @return
 	 */
-	private static OntModel getModelFromDB(IDBConnection con, String name) {
+	private OntModel getModelFromDB(IDBConnection con, String name) {
 		ModelMaker maker = ModelFactory.createModelRDBMaker(con);
 		Model model = maker.getModel(name);
 		OntModel newmodel = ModelFactory.createOntologyModel(
@@ -52,9 +52,22 @@ public class MyOntModel {
 	 * @param maker
 	 * @return
 	 */
-	private static OntModelSpec getModelSpec(ModelMaker maker) {
+	private OntModelSpec getModelSpec(ModelMaker maker) {
 		OntModelSpec spec = new OntModelSpec(OntModelSpec.OWL_MEM);
 		spec.setImportModelMaker(maker);
 		return spec;
+	}
+
+	/**
+	 * update model, and save in db
+	 * 
+	 * @param newModel
+	 * @return
+	 */
+	public OntModel updateModel(OntModel newModel) {
+		ModelMaker maker = ModelFactory.createModelRDBMaker(helper
+				.getConnection());
+		model = ModelFactory.createOntologyModel(getModelSpec(maker), newModel);
+		return model;
 	}
 }
