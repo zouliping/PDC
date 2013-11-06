@@ -3,13 +3,11 @@ package controllers;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import utils.MyOntModel;
 import utils.MyUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.db.IDBConnection;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -19,11 +17,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
-import db.MyDBHelper;
-
 public class Ontology extends Controller {
 
-	private static MyDBHelper helper = new MyDBHelper();
+	private static OntModel model;
 
 	/**
 	 * request for all onto classes
@@ -32,7 +28,7 @@ public class Ontology extends Controller {
 	 */
 	public static Result all() {
 		ArrayList<String> nameList = new ArrayList<String>();
-		OntModel model = getModelFromDB(helper.getConnection(), "pdc");
+		model = MyOntModel.getInstance().getModel();
 
 		for (Iterator<?> i = model.listNamedClasses(); i.hasNext();) {
 			OntClass oc = (OntClass) i.next();
@@ -42,17 +38,7 @@ public class Ontology extends Controller {
 			}
 		}
 
-		helper.closeConnection();
-
-		ObjectNode result = Json.newObject();
-		ArrayNode an = result.arrayNode();
-
-		for (String tmp : nameList) {
-			an.add(tmp);
-		}
-
-		result.putArray("classes").addAll(an);
-		return ok(result);
+		return ok(MyUtils.addList2Json("classes", nameList));
 	}
 
 	/**
@@ -62,7 +48,7 @@ public class Ontology extends Controller {
 	 * @return
 	 */
 	public static Result getProperties(String classname) {
-		OntModel model = getModelFromDB(helper.getConnection(), "pdc");
+		model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		OntClass oc = model.getOntClass(prefix + classname);
 		ArrayList<String> proList = new ArrayList<String>();
@@ -78,15 +64,7 @@ public class Ontology extends Controller {
 				}
 			}
 
-			ObjectNode result = Json.newObject();
-			ArrayNode an = result.arrayNode();
-
-			for (String tmp : proList) {
-				an.add(tmp);
-			}
-
-			result.putArray(classname).addAll(an);
-			return ok(result);
+			return ok(MyUtils.addList2Json(classname, proList));
 		}
 	}
 
