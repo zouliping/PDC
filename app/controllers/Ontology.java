@@ -1,13 +1,14 @@
 package controllers;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import utils.MyUtils;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.db.IDBConnection;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -29,7 +30,7 @@ public class Ontology extends Controller {
 	 * 
 	 * @return
 	 */
-	public static Result all() throws SQLException, ClassNotFoundException {
+	public static Result all() {
 		ArrayList<String> nameList = new ArrayList<String>();
 		OntModel model = getModelFromDB(helper.getConnection(), "pdc");
 
@@ -44,25 +45,49 @@ public class Ontology extends Controller {
 		helper.closeConnection();
 
 		ObjectNode result = Json.newObject();
-		result.putPOJO("classes", nameList);
+		ArrayNode an = result.arrayNode();
+
+		for (String tmp : nameList) {
+			an.add(tmp);
+		}
+
+		result.putArray("classes").addAll(an);
 		return ok(result);
 	}
 
 	/**
 	 * request for properties
 	 * 
-	 * @param className
+	 * @param classname
 	 * @return
 	 */
-	public static Result getProperties(String className){
+	public static Result getProperties(String classname) {
 		OntModel model = getModelFromDB(helper.getConnection(), "pdc");
-		OntClass oc = model.getOntClass(className);
-		if(oc == null)
-			return badRequest(className + " does not exist");
-		else{
-//			OntProperty op = oc.get
+		String prefix = model.getNsPrefixURI("");
+		OntClass oc = model.getOntClass(prefix + classname);
+		ArrayList<String> proList = new ArrayList<String>();
+
+		if (oc == null)
+			return badRequest(MyUtils.getFalseJson());
+		else {
+			for (Iterator<?> i = oc.listDeclaredProperties(); i.hasNext();) {
+				OntProperty op = (OntProperty) i.next();
+
+				if (op != null) {
+					proList.add(op.getLocalName());
+				}
+			}
+
+			ObjectNode result = Json.newObject();
+			ArrayNode an = result.arrayNode();
+
+			for (String tmp : proList) {
+				an.add(tmp);
+			}
+
+			result.putArray(classname).addAll(an);
+			return ok(result);
 		}
-		return null;
 	}
 
 	/**
