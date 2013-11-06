@@ -22,7 +22,8 @@ public class ModelUtil {
 		if (oc == null) {
 			return null;
 		} else {
-			for (Iterator<?> i = oc.listDeclaredProperties(); i.hasNext();) {
+			// true means list all properties except relation
+			for (Iterator<?> i = oc.listDeclaredProperties(true); i.hasNext();) {
 				OntProperty op = (OntProperty) i.next();
 
 				if (op != null) {

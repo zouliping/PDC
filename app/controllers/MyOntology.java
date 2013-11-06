@@ -51,5 +51,10 @@ public class MyOntology extends Controller {
 			return ok(JsonUtil.addList2Json(classname, proList));
 		}
 	}
+	
+	public static Result getRelation(){
+		model = MyOntModel.getInstance().getModel();
+		return ok();
+	}
 
 }
