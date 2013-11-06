@@ -17,6 +17,12 @@ import com.hp.hpl.jena.ontology.OntProperty;
 
 public class MyIndividual extends Controller {
 
+	/**
+	 * add a individual. client post a json, for example
+	 * {"classname":"Writing","individualname":"test","booktitle":"titleTest"}
+	 * 
+	 * @return
+	 */
 	@BodyParser.Of(BodyParser.Json.class)
 	public static Result addIndividual() {
 		JsonNode json = request().body().asJson();
