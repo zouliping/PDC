@@ -1,6 +1,5 @@
 package utils;
 
-import com.hp.hpl.jena.db.IDBConnection;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -16,7 +15,7 @@ public class MyOntModel {
 
 	private MyOntModel() {
 		helper = new MyDBHelper();
-		model = getModelFromDB(helper.getConnection(), "pdc");
+		model = getModelFromDB("pdc");
 	}
 
 	private static class MyOntModelHolder {
@@ -38,8 +37,8 @@ public class MyOntModel {
 	 * @param name
 	 * @return
 	 */
-	private OntModel getModelFromDB(IDBConnection con, String name) {
-		ModelMaker maker = ModelFactory.createModelRDBMaker(con);
+	private OntModel getModelFromDB(String name) {
+		ModelMaker maker = ModelFactory.createModelRDBMaker(helper.getConnection());
 		Model model = maker.getModel(name);
 		OntModel newmodel = ModelFactory.createOntologyModel(
 				getModelSpec(maker), model);

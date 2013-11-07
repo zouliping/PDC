@@ -1,7 +1,6 @@
 package controllers;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -11,6 +10,7 @@ import utils.MyOntModel;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 public class MyOntology extends Controller {
 
@@ -25,7 +25,7 @@ public class MyOntology extends Controller {
 		ArrayList<String> nameList = new ArrayList<String>();
 		model = MyOntModel.getInstance().getModel();
 
-		for (Iterator<?> i = model.listNamedClasses(); i.hasNext();) {
+		for (ExtendedIterator i = model.listNamedClasses(); i.hasNext();) {
 			OntClass oc = (OntClass) i.next();
 
 			if (oc != null) {

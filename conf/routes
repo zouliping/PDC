@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+#GET     /                           controllers.Application.index()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
@@ -15,4 +15,6 @@ GET		/onto/all					controllers.MyOntology.all()
 GET    /onto                        controllers.MyOntology.getProperties(classname)
 
 #MyIndividual
-POST   /indiv/add                   controllers.MyIndividual.addIndividual()
+GET    /indiv/get					 controllers.MyIndividual.get(classname)
+POST   /indiv/add                    controllers.MyIndividual.add()
+POST   /indiv/addproperties          controllers.MyIndividual.addProperties()
