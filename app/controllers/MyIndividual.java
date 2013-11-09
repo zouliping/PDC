@@ -1,7 +1,9 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import play.libs.Json;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -10,6 +12,7 @@ import utils.ModelUtil;
 import utils.MyOntModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -39,19 +42,29 @@ public class MyIndividual extends Controller {
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
+
 		String prefix = model.getNsPrefixURI("");
 		Individual i;
 
-		if (individualname == null) {
+		if (individualname == null || "".equals(individualname)) {
 			i = oc.createIndividual(prefix + uid + "_" + classname + "_"
 					+ System.currentTimeMillis());
 		} else {
-			i = ModelUtil.getExistedIndividual(individualname);
+			i = ModelUtil.getExistedIndividual(prefix + individualname);
 		}
 
-		ArrayList<String> proList = ModelUtil.getPropertyList(oc);
-		ModelUtil.addIndividualProperties(oc, i, proList, json);
+		Iterator<String> it;
+		for (it = json.fieldNames(); it.hasNext();) {
+			System.out.println(it.next());
+			if ("classname".equals(it) || "individualname".equals(it)
+					|| "uid".equals(it)) {
+				it.remove();
+			}
+		}
+		// ArrayList<String> proList = ModelUtil.getPropertyList(oc);
 
+		ModelUtil.addIndividualProperties(oc, i, it, json);
+		
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -94,9 +107,12 @@ public class MyIndividual extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
+		ObjectNode on = Json.newObject();
 		for (StmtIterator si = individual.listProperties(); si.hasNext();) {
 			StatementImpl sti = (StatementImpl) si.next();
+			on.put(sti.getPredicate().getLocalName(), sti.getObject()
+					.toString());
 		}
-		return ok();
+		return ok(on);
 	}
 }

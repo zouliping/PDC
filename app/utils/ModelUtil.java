@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hp.hpl.jena.ontology.Individual;
@@ -104,9 +105,48 @@ public class ModelUtil {
 
 		for (String tmp : proList) {
 			op = model.getOntProperty(pre + tmp);
+
 			String value = json.findPath(tmp).textValue();
+
 			if (value != null) {
-				i.addProperty(op, pre + json.findPath(tmp).textValue());
+				// Charset.forName("UTF-8").encode(value);
+				// System.out.println("@@" + value);
+				i.addProperty(op, pre + value);
+			}
+		}
+
+		MyOntModel.getInstance().updateModel(model);
+
+		return true;
+	}
+
+	/**
+	 * add individual's properties
+	 * 
+	 * @param oc
+	 * @param i
+	 * @param proIterator
+	 * @param json
+	 * @return
+	 */
+	public static Boolean addIndividualProperties(OntClass oc, Individual i,
+			Iterator<String> proIterator, JsonNode json) {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String pre = model.getNsPrefixURI("");
+		OntProperty op;
+		String tmp;
+
+		while (proIterator.hasNext()) {
+			tmp = proIterator.next();
+			op = model.getOntProperty(pre + tmp);
+
+			if (op != null) {
+				String value = json.findPath(tmp).textValue();
+
+				if (value != null) {
+					// Charset.forName("UTF-8").encode(value);
+					i.addProperty(op, pre + value);
+				}
 			}
 		}
 

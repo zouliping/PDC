@@ -7,7 +7,7 @@ import com.hp.hpl.jena.db.DBConnection;
 public class MyDBHelper {
 
 	private final static String driver = "com.mysql.jdbc.Driver";
-	private final static String url = "jdbc:mysql://localhost/testjena";
+	private final static String url = "jdbc:mysql://localhost/testjena?useUnicode=true&characterEncoding=utf8";
 	private final static String db = "MySQL";
 	private final static String user = "root";
 	private final static String pwd = "123456";
