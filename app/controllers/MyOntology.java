@@ -2,14 +2,22 @@ package controllers;
 
 import java.util.ArrayList;
 
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 public class MyOntology extends Controller {
@@ -51,10 +59,50 @@ public class MyOntology extends Controller {
 			return ok(JsonUtil.addList2Json(classname, proList));
 		}
 	}
-	
-	public static Result getRelation(){
+
+	/**
+	 * request for relation
+	 * 
+	 * @param classname1
+	 * @param classname2
+	 * @return
+	 */
+	public static Result getRelation(String classname1, String classname2) {
 		model = MyOntModel.getInstance().getModel();
-		return ok();
+		String defaultPrefix = model.getNsPrefixURI("");
+		String rdfsPrefix = model.getNsPrefixURI("rdfs");
+		String owlPrefix = model.getNsPrefixURI("owl");
+		
+		// Create a new query
+		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
+				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
+				+ owlPrefix + ">\n" + "SELECT ?relation\n"
+				+ "WHERE { ?relation rdfs:domain default:" + classname1
+				+ ".?relation rdfs:range default:" + classname2 + "}";
+
+		// Create the query
+		Query query = QueryFactory.create(queryString);
+		// Execute the query and obtain results
+		QueryExecution qe = QueryExecutionFactory.create(query, model);
+		ResultSet results = qe.execSelect();
+
+		// Get property value
+		String relationValue;
+		if (results.hasNext()) {
+			QuerySolution result = results.nextSolution();
+			relationValue = result.get("relation").toString()
+					.substring(defaultPrefix.length());
+		} else {
+			relationValue = null;
+		}
+
+		// Important - free up resources used running the query
+		qe.close();
+
+		ObjectNode on = Json.newObject();
+		on.put("relation", relationValue);
+
+		return ok(on);
 	}
 
 }
