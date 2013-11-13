@@ -24,7 +24,7 @@ public class MyIndividual extends Controller {
 
 	/**
 	 * add a individual. client post a json, for example
-	 * {"classname":"Writing","individualname":"test","booktitle":"titleTest"}
+	 * {"classname":"Writing","individualname":"test","uid":"123456","booktitle":"titleTest"}
 	 * 
 	 * @return
 	 */
@@ -55,7 +55,6 @@ public class MyIndividual extends Controller {
 
 		Iterator<String> it;
 		for (it = json.fieldNames(); it.hasNext();) {
-			System.out.println(it.next());
 			if ("classname".equals(it) || "individualname".equals(it)
 					|| "uid".equals(it)) {
 				it.remove();
@@ -64,7 +63,7 @@ public class MyIndividual extends Controller {
 		// ArrayList<String> proList = ModelUtil.getPropertyList(oc);
 
 		ModelUtil.addIndividualProperties(oc, i, it, json);
-		
+
 		return ok(JsonUtil.getTrueJson());
 	}
 
