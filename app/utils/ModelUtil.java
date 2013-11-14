@@ -25,7 +25,7 @@ public class ModelUtil {
 		if (oc == null) {
 			return null;
 		} else {
-			// true means list all properties except relation(ObjectProperty)
+			// true means listing all properties except relation(ObjectProperty)
 			for (ExtendedIterator i = oc.listDeclaredProperties(); i.hasNext();) {
 				OntProperty op = (OntProperty) i.next();
 
@@ -70,7 +70,6 @@ public class ModelUtil {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		OntClass oc = model.getOntClass(prefix + classname);
-
 		return oc;
 	}
 
@@ -84,7 +83,6 @@ public class ModelUtil {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual i = model.getIndividual(prefix + individualname);
-
 		return i;
 	}
 
@@ -109,8 +107,6 @@ public class ModelUtil {
 			String value = json.findPath(tmp).textValue();
 
 			if (value != null) {
-				// Charset.forName("UTF-8").encode(value);
-				// System.out.println("@@" + value);
 				i.addProperty(op, pre + value);
 			}
 		}

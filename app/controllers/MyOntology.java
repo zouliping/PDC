@@ -51,7 +51,10 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result getProperties(String classname) {
+		Long a = System.currentTimeMillis();
 		ArrayList<String> proList = ModelUtil.getPropertyList(classname);
+		Long b = System.currentTimeMillis();
+		System.out.println("----" + (b - a));
 
 		if (proList == null) {
 			return badRequest(JsonUtil.getFalseJson());
@@ -68,11 +71,12 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result getRelation(String classname1, String classname2) {
+		Long a = System.currentTimeMillis();
 		model = MyOntModel.getInstance().getModel();
 		String defaultPrefix = model.getNsPrefixURI("");
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
 		String owlPrefix = model.getNsPrefixURI("owl");
-		
+
 		// Create a new query
 		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
@@ -101,6 +105,8 @@ public class MyOntology extends Controller {
 
 		ObjectNode on = Json.newObject();
 		on.put("relation", relationValue);
+		Long b = System.currentTimeMillis();
+		System.out.println("----" + (b - a));
 
 		return ok(on);
 	}

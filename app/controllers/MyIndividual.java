@@ -24,45 +24,67 @@ public class MyIndividual extends Controller {
 
 	/**
 	 * add a individual. client post a json, for example
-	 * {"classname":"Writing","individualname":"test","uid":"123456","booktitle":"titleTest"}
+	 * {"classname":"Writing","individualname"
+	 * :"test","uid":"123456","booktitle":"titleTest"}
 	 * 
 	 * @return
 	 */
 	@BodyParser.Of(BodyParser.Json.class)
-	public static Result add() {
+	public static Result update() {
 		JsonNode json = request().body().asJson();
+		System.out.println(json);
 
 		String classname = json.findPath("classname").textValue();
 		String individualname = json.findPath("individualname").textValue();
 		String uid = json.findPath("uid").textValue();
 
-		OntClass oc = ModelUtil.getExistedClass(classname);
+		Long x = System.currentTimeMillis();
+
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+		Long y = System.currentTimeMillis();
+		System.out.println("create model " + (y - x));
+
+		Long a = System.currentTimeMillis();
+		// OntClass oc = ModelUtil.getExistedClass(classname);
+		OntClass oc = model.getOntClass(prefix + classname);
+		Long b = System.currentTimeMillis();
+		System.out.println("a - b time " + (b - a));
 		if (oc == null) {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		OntModel model = MyOntModel.getInstance().getModel();
+		Long c = System.currentTimeMillis();
+		System.out.println("b - c time " + (c - b));
 
-		String prefix = model.getNsPrefixURI("");
 		Individual i;
 
 		if (individualname == null || "".equals(individualname)) {
 			i = oc.createIndividual(prefix + uid + "_" + classname + "_"
 					+ System.currentTimeMillis());
+			System.out.println("create");
 		} else {
-			i = ModelUtil.getExistedIndividual(prefix + individualname);
+			// i = ModelUtil.getExistedIndividual(prefix + individualname);
+			i = model.getIndividual(prefix + individualname);
 		}
+		Long d = System.currentTimeMillis();
+		System.out.println("c - d time " + (d - c));
 
 		Iterator<String> it;
 		for (it = json.fieldNames(); it.hasNext();) {
-			if ("classname".equals(it) || "individualname".equals(it)
-					|| "uid".equals(it)) {
+			String pro = it.next();
+			if ("classname".equals(pro) || "individualname".equals(pro)
+					|| "uid".equals(pro)) {
 				it.remove();
 			}
 		}
 		// ArrayList<String> proList = ModelUtil.getPropertyList(oc);
+		Long e = System.currentTimeMillis();
+		System.out.println("d - e time " + (e - d));
 
 		ModelUtil.addIndividualProperties(oc, i, it, json);
+		Long f = System.currentTimeMillis();
+		System.out.println("e -f time " + (f - e));
 
 		return ok(JsonUtil.getTrueJson());
 	}

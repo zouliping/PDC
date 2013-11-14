@@ -18,5 +18,5 @@ GET	   /onto/relation				controllers.MyOntology.getRelation(classname1,classname
 #MyIndividual
 GET    /indiv/get					 controllers.MyIndividual.get(classname)
 GET	   /indiv/getpro		    	 controllers.MyIndividual.getProperties(indivname)
-PUT   /indiv/update                  controllers.MyIndividual.add()
-#POST   /indiv/addpro		         controllers.MyIndividual.addProperties()
+PUT    /indiv/update                 controllers.MyIndividual.update()
+#POST  /indiv/addpro		         controllers.MyIndividual.addProperties()
