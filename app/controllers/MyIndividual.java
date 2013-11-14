@@ -10,12 +10,15 @@ import play.mvc.Result;
 import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
+import utils.QueryUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -135,5 +138,61 @@ public class MyIndividual extends Controller {
 					.toString());
 		}
 		return ok(on);
+	}
+
+	/**
+	 * get individuals by class label
+	 * 
+	 * @return
+	 */
+	public static Result getIndivByClassLabel() {
+		JsonNode json = request().body().asJson();
+
+		OntModel model = MyOntModel.getInstance().getModel();
+
+		// Get prefixes
+		String defaultPrefix = model.getNsPrefixURI("");
+		String rdfsPrefix = model.getNsPrefixURI("rdfs");
+		String owlPrefix = model.getNsPrefixURI("owl");
+
+		// Create a new query
+		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
+				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
+				+ owlPrefix + ">\n" + "SELECT ?classes\n" + "WHERE { ";
+
+		if (json.findPath("classLabel").isArray()) {
+			for (Iterator<JsonNode> it = json.findPath("classLabel").elements(); it
+					.hasNext();) {
+				JsonNode label = it.next();
+				queryString += "?classes rdfs:label \"" + label.textValue()
+						+ "\"^^<http://www.w3.org/2001/XMLSchema#string>.";
+			}
+			queryString += "}";
+		}
+		System.out.println(queryString);
+
+		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
+
+		String className;
+		while (resultSet.hasNext()) {
+			QuerySolution result = resultSet.nextSolution();
+			className = result.get("classes").toString()
+					.substring(defaultPrefix.length());
+			System.out.println(className);
+		}
+
+		QueryUtil.closeQE();
+		return ok();
+	}
+
+	/**
+	 * get individuals by attrbute label
+	 * 
+	 * @return
+	 */
+	public static Result getIndivByAttrLabel() {
+		// JsonNode json = request().body().asJson();
+
+		return ok();
 	}
 }

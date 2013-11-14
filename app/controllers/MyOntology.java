@@ -8,14 +8,11 @@ import play.mvc.Result;
 import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
+import utils.QueryUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -84,11 +81,7 @@ public class MyOntology extends Controller {
 				+ "WHERE { ?relation rdfs:domain default:" + classname1
 				+ ".?relation rdfs:range default:" + classname2 + "}";
 
-		// Create the query
-		Query query = QueryFactory.create(queryString);
-		// Execute the query and obtain results
-		QueryExecution qe = QueryExecutionFactory.create(query, model);
-		ResultSet results = qe.execSelect();
+		ResultSet results = QueryUtil.doQuery(model, queryString);
 
 		// Get property value
 		String relationValue;
@@ -100,8 +93,7 @@ public class MyOntology extends Controller {
 			relationValue = null;
 		}
 
-		// Important - free up resources used running the query
-		qe.close();
+		QueryUtil.closeQE();
 
 		ObjectNode on = Json.newObject();
 		on.put("relation", relationValue);
