@@ -206,7 +206,7 @@ public class MyIndividual extends Controller {
 						+ "PREFIX rdfs: <" + rdfsPrefix + ">\n"
 						+ "PREFIX owl: <" + owlPrefix + ">\n"
 						+ "SELECT ?classes\n" + "WHERE { default:" + name
-						+ " rdfs:domain ?classes";
+						+ " rdfs:domain ?classes }";
 				ResultSet results = QueryUtil.doQuery(model, queryStr);
 
 				while (results.hasNext()) {
