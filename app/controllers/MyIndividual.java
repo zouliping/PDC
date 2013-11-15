@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -141,11 +142,11 @@ public class MyIndividual extends Controller {
 	}
 
 	/**
-	 * get individuals by class label
+	 * get individuals by labels
 	 * 
 	 * @return
 	 */
-	public static Result getIndivByClassLabel() {
+	public static Result getIndivByLabel() {
 		JsonNode json = request().body().asJson();
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -155,16 +156,16 @@ public class MyIndividual extends Controller {
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
 		String owlPrefix = model.getNsPrefixURI("owl");
 
-		// Create a new query
+		// Create a new query to find classes which have labels
 		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
-				+ owlPrefix + ">\n" + "SELECT ?classes\n" + "WHERE { ";
+				+ owlPrefix + ">\n" + "SELECT ?tmp\n" + "WHERE { ";
 
-		if (json.findPath("classLabel").isArray()) {
-			for (Iterator<JsonNode> it = json.findPath("classLabel").elements(); it
-					.hasNext();) {
+		JsonNode array = json.findPath("label");
+		if (array.isArray()) {
+			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
 				JsonNode label = it.next();
-				queryString += "?classes rdfs:label \"" + label.textValue()
+				queryString += "?tmp rdfs:label \"" + label.textValue()
 						+ "\"^^<http://www.w3.org/2001/XMLSchema#string>.";
 			}
 			queryString += "}";
@@ -173,26 +174,51 @@ public class MyIndividual extends Controller {
 
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
-		String className;
+		Boolean isClass = json.path("isClass").asBoolean();
+		ObjectNode re = Json.newObject();
+
 		while (resultSet.hasNext()) {
 			QuerySolution result = resultSet.nextSolution();
-			className = result.get("classes").toString()
+			String name = result.get("tmp").toString()
 					.substring(defaultPrefix.length());
-			System.out.println(className);
+			System.out.println(name);
+
+			if (isClass) {
+				OntClass oc = model.getOntClass(defaultPrefix + name);
+				for (ExtendedIterator ei = oc.listInstances(); ei.hasNext();) {
+					System.out.println(ei.next());
+
+					Individual i = (Individual) ei.next();
+					ObjectNode tmp = Json.newObject();
+
+					for (StmtIterator st = i.listProperties(); st.hasNext();) {
+						StatementImpl sti = (StatementImpl) st.next();
+						tmp.put(sti.getPredicate().getLocalName(), sti
+								.getObject().toString());
+					}
+					re.put(i.getLocalName(), tmp);
+				}
+			} else {
+				// OntProperty op = model.getOntProperty(defaultPrefix + name);
+				// System.out.println(op.getDomain().getLocalName());
+
+				String queryStr = "PREFIX default: <" + defaultPrefix + ">\n"
+						+ "PREFIX rdfs: <" + rdfsPrefix + ">\n"
+						+ "PREFIX owl: <" + owlPrefix + ">\n"
+						+ "SELECT ?classes\n" + "WHERE { default:" + name
+						+ " rdfs:domain ?classes";
+				ResultSet results = QueryUtil.doQuery(model, queryStr);
+
+				while (results.hasNext()) {
+					QuerySolution querySolution = resultSet.nextSolution();
+					String className = querySolution.get("classes").toString()
+							.substring(defaultPrefix.length());
+					System.out.println(className);
+				}
+			}
 		}
 
 		QueryUtil.closeQE();
-		return ok();
-	}
-
-	/**
-	 * get individuals by attrbute label
-	 * 
-	 * @return
-	 */
-	public static Result getIndivByAttrLabel() {
-		// JsonNode json = request().body().asJson();
-
-		return ok();
+		return ok(re);
 	}
 }
