@@ -18,6 +18,7 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -109,7 +110,7 @@ public class MyIndividual extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		for (ExtendedIterator i = oc.listInstances(); i.hasNext();) {
+		for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
 			Individual individual = (Individual) i.next();
 			indivList.add(individual.getLocalName());
 		}
@@ -170,7 +171,6 @@ public class MyIndividual extends Controller {
 			}
 			queryString += "}";
 		}
-		System.out.println(queryString);
 
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
@@ -181,13 +181,11 @@ public class MyIndividual extends Controller {
 			QuerySolution result = resultSet.nextSolution();
 			String name = result.get("tmp").toString()
 					.substring(defaultPrefix.length());
-			System.out.println(name);
 
+			// deal with class label
 			if (isClass) {
 				OntClass oc = model.getOntClass(defaultPrefix + name);
-				for (ExtendedIterator ei = oc.listInstances(); ei.hasNext();) {
-					System.out.println(ei.next());
-
+				for (ExtendedIterator<?> ei = oc.listInstances(); ei.hasNext();) {
 					Individual i = (Individual) ei.next();
 					ObjectNode tmp = Json.newObject();
 
@@ -198,26 +196,42 @@ public class MyIndividual extends Controller {
 					}
 					re.put(i.getLocalName(), tmp);
 				}
+				// deal with property label
 			} else {
-				// OntProperty op = model.getOntProperty(defaultPrefix + name);
-				// System.out.println(op.getDomain().getLocalName());
+				ArrayList<OntClass> classList = new ArrayList<OntClass>();
+				OntProperty op = model.getOntProperty(defaultPrefix + name);
+				ExtendedIterator<?> ei = op.listDomain();
 
-				String queryStr = "PREFIX default: <" + defaultPrefix + ">\n"
-						+ "PREFIX rdfs: <" + rdfsPrefix + ">\n"
-						+ "PREFIX owl: <" + owlPrefix + ">\n"
-						+ "SELECT ?classes\n" + "WHERE { default:" + name
-						+ " rdfs:domain ?classes }";
-				ResultSet results = QueryUtil.doQuery(model, queryStr);
+				// to get all classes which have the same property
+				if (ei.hasNext()) {
+					OntClass oc = (OntClass) ei.next();
+					if (oc.isUnionClass()) {
+						UnionClass unionClass = oc.asUnionClass();
+						ei = unionClass.listOperands();
+						while (ei.hasNext()) {
+							OntClass itemClass = (OntClass) ei.next();
+							classList.add(itemClass);
+						}
+					} else {
+						classList.add(model.getOntClass(op.getDomain()
+								.toString()));
+					}
+				}
 
-				while (results.hasNext()) {
-					QuerySolution querySolution = resultSet.nextSolution();
-					String className = querySolution.get("classes").toString()
-							.substring(defaultPrefix.length());
-					System.out.println(className);
+				for (OntClass tmpClass : classList) {
+					for (ExtendedIterator<?> ei2 = tmpClass.listInstances(); ei2
+							.hasNext();) {
+						Individual individual = (Individual) ei2.next();
+						ObjectNode onNode = Json.newObject();
+						if ((individual.getPropertyValue(op)) != null) {
+							onNode.put(name, individual.getPropertyValue(op)
+									.toString());
+						}
+						re.put(individual.getLocalName(), onNode);
+					}
 				}
 			}
 		}
-
 		QueryUtil.closeQE();
 		return ok(re);
 	}
