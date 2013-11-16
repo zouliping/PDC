@@ -141,7 +141,7 @@ public class ModelUtil {
 
 				if (value != null) {
 					// Charset.forName("UTF-8").encode(value);
-					i.addProperty(op, pre + value);
+					i.addProperty(op, value);
 				}
 			}
 		}
