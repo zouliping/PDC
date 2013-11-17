@@ -17,7 +17,7 @@ GET	   /onto/relation				controllers.MyOntology.getRelation(classname1,classname
 
 #MyIndividual
 GET    /indiv/get					 controllers.MyIndividual.get(classname)
-GET	   /indiv/getpro		    	 controllers.MyIndividual.getProperties(indivname)
+GET	   /indiv/getpro		    	 controllers.MyIndividual.getProperties(indivname,proname ?= null)
 PUT    /indiv/update                 controllers.MyIndividual.update()
-#POST  /indiv/addpro		         controllers.MyIndividual.addProperties()
-POST   /indiv/getbylabel			 controllers.MyIndividual.getIndivByLabel()
+PUT   /indiv/getbylabel			     controllers.MyIndividual.getIndivByLabel()
+GET	   /indiv/remove                 controllers.MyIndividual.remove(indivname,proname ?= null)

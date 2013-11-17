@@ -124,7 +124,7 @@ public class MyIndividual extends Controller {
 	 * @param individualname
 	 * @return
 	 */
-	public static Result getProperties(String individualname) {
+	public static Result getProperties(String individualname, String proname) {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
@@ -134,10 +134,15 @@ public class MyIndividual extends Controller {
 		}
 
 		ObjectNode on = Json.newObject();
-		for (StmtIterator si = individual.listProperties(); si.hasNext();) {
-			StatementImpl sti = (StatementImpl) si.next();
-			on.put(sti.getPredicate().getLocalName(), sti.getObject()
-					.toString());
+		if (proname == null) {
+			for (StmtIterator si = individual.listProperties(); si.hasNext();) {
+				StatementImpl sti = (StatementImpl) si.next();
+				on.put(sti.getPredicate().getLocalName(), sti.getObject()
+						.toString());
+			}
+		} else {
+			OntProperty op = model.getOntProperty(prefix + proname);
+			on.put(proname, individual.getPropertyValue(op).toString());
 		}
 		return ok(on);
 	}
@@ -179,12 +184,11 @@ public class MyIndividual extends Controller {
 
 		while (resultSet.hasNext()) {
 			QuerySolution result = resultSet.nextSolution();
-			String name = result.get("tmp").toString()
-					.substring(defaultPrefix.length());
+			String name = result.get("tmp").toString();
 
 			// deal with class label
 			if (isClass) {
-				OntClass oc = model.getOntClass(defaultPrefix + name);
+				OntClass oc = model.getOntClass(name);
 				for (ExtendedIterator<?> ei = oc.listInstances(); ei.hasNext();) {
 					Individual i = (Individual) ei.next();
 					ObjectNode tmp = Json.newObject();
@@ -199,7 +203,7 @@ public class MyIndividual extends Controller {
 				// deal with property label
 			} else {
 				ArrayList<OntClass> classList = new ArrayList<OntClass>();
-				OntProperty op = model.getOntProperty(defaultPrefix + name);
+				OntProperty op = model.getOntProperty(name);
 				ExtendedIterator<?> ei = op.listDomain();
 
 				// to get all classes which have the same property
@@ -234,5 +238,31 @@ public class MyIndividual extends Controller {
 		}
 		QueryUtil.closeQE();
 		return ok(re);
+	}
+
+	/**
+	 * remove the individual
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static Result remove(String indivname, String proname) {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+		Individual i = model.getIndividual(prefix + indivname);
+		if (i == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+		if (proname == null) {
+			i.remove();
+		} else {
+			OntProperty op = model.getOntProperty(prefix + proname);
+			if (op != null) {
+				i.removeProperty(op, i.getPropertyValue(op));
+			} else {
+				return badRequest(JsonUtil.getFalseJson());
+			}
+		}
+		return ok(JsonUtil.getTrueJson());
 	}
 }

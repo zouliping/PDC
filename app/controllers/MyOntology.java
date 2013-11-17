@@ -30,7 +30,8 @@ public class MyOntology extends Controller {
 		ArrayList<String> nameList = new ArrayList<String>();
 		model = MyOntModel.getInstance().getModel();
 
-		for (ExtendedIterator i = model.listNamedClasses(); i.hasNext();) {
+		for (ExtendedIterator<OntClass> i = model.listNamedClasses(); i
+				.hasNext();) {
 			OntClass oc = (OntClass) i.next();
 
 			if (oc != null) {
@@ -102,5 +103,4 @@ public class MyOntology extends Controller {
 
 		return ok(on);
 	}
-
 }

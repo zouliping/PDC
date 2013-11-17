@@ -26,7 +26,8 @@ public class ModelUtil {
 			return null;
 		} else {
 			// true means listing all properties except relation(ObjectProperty)
-			for (ExtendedIterator i = oc.listDeclaredProperties(); i.hasNext();) {
+			for (ExtendedIterator<OntProperty> i = oc.listDeclaredProperties(); i
+					.hasNext();) {
 				OntProperty op = (OntProperty) i.next();
 
 				if (op != null) {
@@ -49,7 +50,8 @@ public class ModelUtil {
 		if (oc == null) {
 			return null;
 		} else {
-			for (ExtendedIterator i = oc.listDeclaredProperties(); i.hasNext();) {
+			for (ExtendedIterator<OntProperty> i = oc.listDeclaredProperties(); i
+					.hasNext();) {
 				OntProperty op = (OntProperty) i.next();
 
 				if (op != null) {
@@ -147,7 +149,6 @@ public class ModelUtil {
 		}
 
 		MyOntModel.getInstance().updateModel(model);
-
 		return true;
 	}
 
