@@ -10,6 +10,7 @@ import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.QueryUtil;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -102,5 +103,20 @@ public class MyOntology extends Controller {
 		System.out.println("----" + (b - a));
 
 		return ok(on);
+	}
+	
+	public static Result add(){
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+		
+		JsonNode json = request().body().asJson();
+		String classname = json.findPath("classname").textValue();
+		
+		if(classname == null){
+			return badRequest(JsonUtil.getFalseJson());
+		}
+		
+		
+		return ok();
 	}
 }
