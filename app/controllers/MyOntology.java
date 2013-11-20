@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import play.libs.Json;
 import play.mvc.Controller;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -104,19 +106,38 @@ public class MyOntology extends Controller {
 
 		return ok(on);
 	}
-	
-	public static Result add(){
+
+	/**
+	 * add a class
+	 * 
+	 * @return
+	 */
+	public static Result add() {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
-		
+
 		JsonNode json = request().body().asJson();
 		String classname = json.findPath("classname").textValue();
-		
-		if(classname == null){
+		System.out.println(classname);
+
+		if (classname == null) {
 			return badRequest(JsonUtil.getFalseJson());
 		}
-		
-		
-		return ok();
+
+		OntClass oc = model.createClass(prefix + classname);
+		JsonNode array = json.findPath("attr");
+		OntProperty op;
+
+		if (array.isArray()) {
+			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
+				JsonNode attr = it.next();
+				op = model.createOntProperty(prefix + attr.textValue());
+				System.out.println(attr.textValue());
+				// value is null
+				oc.addProperty(op, "");
+			}
+			MyOntModel.getInstance().updateModel(model);
+		}
+		return ok(JsonUtil.getTrueJson());
 	}
 }

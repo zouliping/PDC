@@ -263,6 +263,8 @@ public class MyIndividual extends Controller {
 				return badRequest(JsonUtil.getFalseJson());
 			}
 		}
+		// update the model in db
+		MyOntModel.getInstance().updateModel(model);
 		return ok(JsonUtil.getTrueJson());
 	}
 }
