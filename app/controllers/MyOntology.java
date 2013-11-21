@@ -13,11 +13,37 @@ import utils.QueryUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.ontology.AllDifferent;
+import com.hp.hpl.jena.ontology.AnnotationProperty;
+import com.hp.hpl.jena.ontology.DataRange;
+import com.hp.hpl.jena.ontology.DatatypeProperty;
+import com.hp.hpl.jena.ontology.FunctionalProperty;
+import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.InverseFunctionalProperty;
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.ontology.Ontology;
+import com.hp.hpl.jena.ontology.Profile;
+import com.hp.hpl.jena.ontology.Restriction;
+import com.hp.hpl.jena.ontology.SymmetricProperty;
+import com.hp.hpl.jena.ontology.TransitiveProperty;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.RDFVisitor;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 public class MyOntology extends Controller {
@@ -118,7 +144,6 @@ public class MyOntology extends Controller {
 
 		JsonNode json = request().body().asJson();
 		String classname = json.findPath("classname").textValue();
-		System.out.println(classname);
 
 		if (classname == null) {
 			return badRequest(JsonUtil.getFalseJson());
@@ -132,9 +157,8 @@ public class MyOntology extends Controller {
 			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
 				JsonNode attr = it.next();
 				op = model.createOntProperty(prefix + attr.textValue());
-				System.out.println(attr.textValue());
-				// value is null
-				oc.addProperty(op, "");
+				// attach a property to a class
+				op.addDomain(oc);
 			}
 			MyOntModel.getInstance().updateModel(model);
 		}
