@@ -39,10 +39,10 @@ public class ModelUtil {
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			model.read(isr, null);
 
+			model.commit();
+
 			isr.close();
 			fis.close();
-
-			model.commit();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
@@ -186,6 +186,7 @@ public class ModelUtil {
 				String value = json.findPath(tmp).textValue();
 
 				if (value != null) {
+					System.out.println(value);
 					// Charset.forName("UTF-8").encode(value);
 					i.addProperty(op, value);
 				}

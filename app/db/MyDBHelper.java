@@ -26,10 +26,14 @@ public class MyDBHelper {
 
 	public void createDB() {
 		try {
-			Connection connection = DriverManager.getConnection(url, user, pwd);
+			String mUrl = "jdbc:mysql://localhost/testjena?useUnicode=true&characterEncoding=utf8";
+			Connection connection = DriverManager
+					.getConnection(mUrl, user, pwd);
 			Statement stmt = connection.createStatement();
 
-			stmt.executeUpdate("create databse if not exist " + UserUtil.uid);
+			// remember to set database character
+			stmt.executeUpdate("create database if not exists " + UserUtil.uid
+					+ " default character set utf8 collate utf8_bin");
 
 			stmt.close();
 			connection.close();
