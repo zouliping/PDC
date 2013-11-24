@@ -1,6 +1,9 @@
 package db;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import utils.UserUtil;
 
@@ -19,6 +22,21 @@ public class MyDBHelper {
 	public MyDBHelper() {
 		url = "jdbc:mysql://localhost/" + UserUtil.uid
 				+ "?useUnicode=true&characterEncoding=utf8";
+	}
+
+	public void createDB() {
+		try {
+			Connection connection = DriverManager.getConnection(url, user, pwd);
+			Statement stmt = connection.createStatement();
+
+			stmt.executeUpdate("create databse if not exist " + UserUtil.uid);
+
+			stmt.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**

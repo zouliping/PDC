@@ -1,16 +1,60 @@
 package utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.hp.hpl.jena.db.IDBConnection;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 public class ModelUtil {
+
+	/**
+	 * read owl file, create the ontModel, and store in db
+	 * 
+	 * @param conn
+	 * @return
+	 */
+	public static OntModel createModel(IDBConnection conn) {
+		ModelMaker maker = ModelFactory.createModelRDBMaker(conn);
+		Model model = maker.createModel("pdc");
+
+		try {
+			File file = new File("./owl/OntologyPDC_test.owl");
+			FileInputStream fis = new FileInputStream(file);
+			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			model.read(isr, null);
+
+			isr.close();
+			fis.close();
+
+			model.commit();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		OntModelSpec spec = new OntModelSpec(
+				OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		return ModelFactory.createOntologyModel(spec, model);
+	}
 
 	/**
 	 * get a specific class's properties
