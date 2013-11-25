@@ -230,7 +230,7 @@ public class ModelUtil {
 	 * @param classname2
 	 * @return
 	 */
-	public String getRelation(String classname1, String classname2) {
+	public static String getRelation(String classname1, String classname2) {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String defaultPrefix = model.getNsPrefixURI("");
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
@@ -249,8 +249,7 @@ public class ModelUtil {
 		String relationValue;
 		if (results.hasNext()) {
 			QuerySolution result = results.nextSolution();
-			relationValue = result.get("relation").toString()
-					.substring(defaultPrefix.length());
+			relationValue = result.get("relation").toString();
 		} else {
 			relationValue = null;
 		}

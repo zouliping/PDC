@@ -15,6 +15,7 @@ import utils.QueryUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
@@ -101,6 +102,7 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result addRelation() {
 		JsonNode json = request().body().asJson();
+
 		String id1 = json.findPath("id1").textValue();
 		String id2 = json.findPath("id2").textValue();
 
@@ -110,8 +112,26 @@ public class MyIndividual extends Controller {
 		if (classname1 == null || classname2 == null) {
 			return badRequest(JsonUtil.getFalseJson());
 		}
-		
-		
+
+		String relation = ModelUtil.getRelation(classname1, classname2);
+		if (relation == null) {
+			relation = ModelUtil.getRelation(classname2, classname1);
+			String tmp = id1;
+			id1 = id2;
+			id2 = tmp;
+		}
+
+		System.out.println(relation);
+
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+		Individual i1 = model.getIndividual(prefix + id1);
+		Individual i2 = model.getIndividual(prefix + id2);
+		ObjectProperty op = model.getObjectProperty(relation);
+
+		StatementImpl stmt = new StatementImpl(i1, op, i2);
+		System.out.println(stmt);
+		model.add(stmt);
 
 		return ok();
 	}
