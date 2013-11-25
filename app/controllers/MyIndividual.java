@@ -11,6 +11,7 @@ import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.QueryUtil;
+import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,38 +44,25 @@ public class MyIndividual extends Controller {
 		String classname = json.findPath("classname").textValue();
 		String individualname = json.findPath("individualname").textValue();
 		String uid = json.findPath("uid").textValue();
-
-		Long x = System.currentTimeMillis();
+		UserUtil.uid = uid;
 
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
-		Long y = System.currentTimeMillis();
-		System.out.println("create model " + (y - x));
 
 		Long a = System.currentTimeMillis();
-		// OntClass oc = ModelUtil.getExistedClass(classname);
 		OntClass oc = model.getOntClass(prefix + classname);
 		Long b = System.currentTimeMillis();
-		System.out.println("a - b time " + (b - a));
+		System.out.println("getontclass time " + (b - a));
 		if (oc == null) {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		Long c = System.currentTimeMillis();
-		System.out.println("b - c time " + (c - b));
-
 		Individual i;
-
 		if (individualname == null || "".equals(individualname)) {
-			i = oc.createIndividual(prefix + uid + "_" + classname + "_"
-					+ System.currentTimeMillis());
-			System.out.println("create");
+			i = oc.createIndividual(prefix + json.findPath("id").textValue());
 		} else {
-			// i = ModelUtil.getExistedIndividual(prefix + individualname);
 			i = model.getIndividual(prefix + individualname);
 		}
-		Long d = System.currentTimeMillis();
-		System.out.println("c - d time " + (d - c));
 
 		Iterator<String> it;
 		for (it = json.fieldNames(); it.hasNext();) {
@@ -84,14 +72,7 @@ public class MyIndividual extends Controller {
 				it.remove();
 			}
 		}
-		// ArrayList<String> proList = ModelUtil.getPropertyList(oc);
-		Long e = System.currentTimeMillis();
-		System.out.println("d - e time " + (e - d));
-
 		ModelUtil.addIndividualProperties(oc, i, it, json);
-		Long f = System.currentTimeMillis();
-		System.out.println("e -f time " + (f - e));
-
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -100,12 +81,8 @@ public class MyIndividual extends Controller {
 	 * 
 	 * @return
 	 */
-	public static Result addRelation() {
-		JsonNode json = request().body().asJson();
-
-		String id1 = json.findPath("id1").textValue();
-		String id2 = json.findPath("id2").textValue();
-
+	public static Result addRelation(String id1, String id2, String uid) {
+		UserUtil.uid = uid;
 		String classname1 = ModelUtil.getClassname(id1);
 		String classname2 = ModelUtil.getClassname(id2);
 
@@ -121,8 +98,6 @@ public class MyIndividual extends Controller {
 			id2 = tmp;
 		}
 
-		System.out.println(relation);
-
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual i1 = model.getIndividual(prefix + id1);
@@ -130,10 +105,9 @@ public class MyIndividual extends Controller {
 		ObjectProperty op = model.getObjectProperty(relation);
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
-		System.out.println(stmt);
 		model.add(stmt);
 
-		return ok();
+		return ok(JsonUtil.getTrueJson());
 	}
 
 	/**
@@ -142,7 +116,8 @@ public class MyIndividual extends Controller {
 	 * @param classname
 	 * @return
 	 */
-	public static Result get(String classname) {
+	public static Result get(String classname, String uid) {
+		UserUtil.uid = uid;
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		OntClass oc = model.getOntClass(prefix + classname);
@@ -166,7 +141,9 @@ public class MyIndividual extends Controller {
 	 * @param individualname
 	 * @return
 	 */
-	public static Result getProperties(String individualname, String proname) {
+	public static Result getProperties(String individualname, String proname,
+			String uid) {
+		UserUtil.uid = uid;
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
@@ -196,6 +173,7 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result getIndivByLabel() {
 		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
 
 		OntModel model = MyOntModel.getInstance().getModel();
 
@@ -288,7 +266,8 @@ public class MyIndividual extends Controller {
 	 * @param name
 	 * @return
 	 */
-	public static Result remove(String indivname, String proname) {
+	public static Result remove(String indivname, String proname, String uid) {
+		UserUtil.uid = uid;
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual i = model.getIndividual(prefix + indivname);

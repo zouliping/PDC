@@ -10,6 +10,7 @@ import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.QueryUtil;
+import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -51,11 +52,9 @@ public class MyOntology extends Controller {
 	 * @param classname
 	 * @return
 	 */
-	public static Result getProperties(String classname) {
-		Long a = System.currentTimeMillis();
+	public static Result getProperties(String classname, String uid) {
+		UserUtil.uid = uid;
 		ArrayList<String> proList = ModelUtil.getPropertyList(classname);
-		Long b = System.currentTimeMillis();
-		System.out.println("----" + (b - a));
 
 		if (proList == null) {
 			return badRequest(JsonUtil.getFalseJson());
@@ -71,8 +70,9 @@ public class MyOntology extends Controller {
 	 * @param classname2
 	 * @return
 	 */
-	public static Result getRelation(String classname1, String classname2) {
-		Long a = System.currentTimeMillis();
+	public static Result getRelation(String classname1, String classname2,
+			String uid) {
+		UserUtil.uid = uid;
 		model = MyOntModel.getInstance().getModel();
 		String defaultPrefix = model.getNsPrefixURI("");
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
@@ -101,8 +101,6 @@ public class MyOntology extends Controller {
 
 		ObjectNode on = Json.newObject();
 		on.put("relation", relationValue);
-		Long b = System.currentTimeMillis();
-		System.out.println("----" + (b - a));
 
 		return ok(on);
 	}
