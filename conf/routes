@@ -3,8 +3,8 @@
 # ~~~~
 
 # Home page
-PUT		/user/register				controllers.Application.registerUser()
-PUT		/user/login					controllers.Application.login()
+POST		/user/register				controllers.Application.registerUser()
+POST		/user/login					controllers.Application.login()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

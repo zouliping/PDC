@@ -16,6 +16,8 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
@@ -186,7 +188,6 @@ public class ModelUtil {
 				String value = json.findPath(tmp).textValue();
 
 				if (value != null) {
-					System.out.println(value);
 					// Charset.forName("UTF-8").encode(value);
 					i.addProperty(op, value);
 				}
@@ -197,4 +198,64 @@ public class ModelUtil {
 		return true;
 	}
 
+	/**
+	 * get a class name by individual name
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public static String getClassname(String id) {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String pre = model.getNsPrefixURI("");
+		String rdfPre = model.getNsPrefixURI("rdf");
+		Individual individual = model.getIndividual(pre + id);
+
+		if (individual == null) {
+			return null;
+		}
+
+		OntProperty op = model.getOntProperty(rdfPre + "type");
+		String[] tmp = individual.getPropertyValue(op).toString().split("#");
+		if (tmp.length == 2) {
+			return tmp[1];
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * get relation
+	 * 
+	 * @param classname1
+	 * @param classname2
+	 * @return
+	 */
+	public String getRelation(String classname1, String classname2) {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String defaultPrefix = model.getNsPrefixURI("");
+		String rdfsPrefix = model.getNsPrefixURI("rdfs");
+		String owlPrefix = model.getNsPrefixURI("owl");
+
+		// Create a new query
+		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
+				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
+				+ owlPrefix + ">\n" + "SELECT ?relation\n"
+				+ "WHERE { ?relation rdfs:domain default:" + classname1
+				+ ".?relation rdfs:range default:" + classname2 + "}";
+
+		ResultSet results = QueryUtil.doQuery(model, queryString);
+
+		// Get property value
+		String relationValue;
+		if (results.hasNext()) {
+			QuerySolution result = results.nextSolution();
+			relationValue = result.get("relation").toString()
+					.substring(defaultPrefix.length());
+		} else {
+			relationValue = null;
+		}
+
+		QueryUtil.closeQE();
+		return relationValue;
+	}
 }

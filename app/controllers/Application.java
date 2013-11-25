@@ -49,6 +49,7 @@ public class Application extends Controller {
 	 */
 	public static Result registerUser() {
 		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
 		UserUtil.uid = json.findPath("id").textValue();
 		System.out.println(UserUtil.uid);
 		MyDBHelper helper = new MyDBHelper();

@@ -95,6 +95,28 @@ public class MyIndividual extends Controller {
 	}
 
 	/**
+	 * add relation
+	 * 
+	 * @return
+	 */
+	public static Result addRelation() {
+		JsonNode json = request().body().asJson();
+		String id1 = json.findPath("id1").textValue();
+		String id2 = json.findPath("id2").textValue();
+
+		String classname1 = ModelUtil.getClassname(id1);
+		String classname2 = ModelUtil.getClassname(id2);
+
+		if (classname1 == null || classname2 == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+		
+		
+
+		return ok();
+	}
+
+	/**
 	 * get a class's individuals
 	 * 
 	 * @param classname
