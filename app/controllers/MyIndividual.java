@@ -43,8 +43,7 @@ public class MyIndividual extends Controller {
 
 		String classname = json.findPath("classname").textValue();
 		String individualname = json.findPath("individualname").textValue();
-		String uid = json.findPath("uid").textValue();
-		UserUtil.uid = uid;
+		UserUtil.uid = json.findPath("uid").textValue();
 
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
@@ -57,12 +56,12 @@ public class MyIndividual extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		Individual i;
-		if (individualname == null || "".equals(individualname)) {
-			i = oc.createIndividual(prefix + json.findPath("id").textValue());
-		} else {
-			i = model.getIndividual(prefix + individualname);
-		}
+		Individual i = oc.createIndividual(prefix + individualname);
+		// if (individualname == null || "".equals(individualname)) {
+		// i = oc.createIndividual(prefix + json.findPath("id").textValue());
+		// } else {
+		// i = model.getIndividual(prefix + individualname);
+		// }
 
 		Iterator<String> it;
 		for (it = json.fieldNames(); it.hasNext();) {
@@ -81,10 +80,15 @@ public class MyIndividual extends Controller {
 	 * 
 	 * @return
 	 */
-	public static Result addRelation(String id1, String id2, String uid) {
-		UserUtil.uid = uid;
+	public static Result addRelation() {
+		JsonNode json = request().body().asJson();
+		String id1 = json.findPath("id1").textValue();
+		String id2 = json.findPath("id2").textValue();
+		UserUtil.uid = json.findPath("uid").textValue();
 		String classname1 = ModelUtil.getClassname(id1);
 		String classname2 = ModelUtil.getClassname(id2);
+
+		System.out.println(classname1 + "---" + classname2);
 
 		if (classname1 == null || classname2 == null) {
 			return badRequest(JsonUtil.getFalseJson());
@@ -97,7 +101,7 @@ public class MyIndividual extends Controller {
 			id1 = id2;
 			id2 = tmp;
 		}
-
+		System.out.println(relation);
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual i1 = model.getIndividual(prefix + id1);
@@ -266,11 +270,16 @@ public class MyIndividual extends Controller {
 	 * @param name
 	 * @return
 	 */
-	public static Result remove(String indivname, String proname, String uid) {
-		UserUtil.uid = uid;
+	public static Result remove() {
+		JsonNode json = request().body().asJson();
+		String indivname = json.findPath("indivname").textValue();
+		String proname = json.findPath("proname").textValue();
+		UserUtil.uid = json.findPath("uid").textValue();
+
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual i = model.getIndividual(prefix + indivname);
+
 		if (i == null) {
 			return badRequest(JsonUtil.getFalseJson());
 		}

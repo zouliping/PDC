@@ -3,24 +3,24 @@
 # ~~~~
 
 # Home page
-POST		/user/register				controllers.Application.registerUser()
-POST		/user/login					controllers.Application.login()
+POST	/user/register				controllers.Application.registerUser()
+POST	/user/login					controllers.Application.login()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET		/assets/*file               controllers.Assets.at(path="/public", file)
 
 #MyOntology
 #show all classes name
 GET		/onto/all					controllers.MyOntology.all()
 #get specific properties
-GET    /onto/get                    controllers.MyOntology.getProperties(classname,uid)
-GET	   /onto/relation				controllers.MyOntology.getRelation(classname1,classname2,uid)
+GET		/onto/get                    controllers.MyOntology.getProperties(classname,uid)
+GET		/onto/relation				controllers.MyOntology.getRelation(classname1,classname2,uid)
 PUT		/onto/add					controllers.MyOntology.add()
 
 #MyIndividual
-GET    /indiv/get					 controllers.MyIndividual.get(classname,uid)
-GET	   /indiv/getpro		    	 controllers.MyIndividual.getProperties(indivname,proname ?= null,uid)
-PUT    /indiv/update                 controllers.MyIndividual.update()
-PUT   /indiv/getbylabel			     controllers.MyIndividual.getIndivByLabel()
-GET	   /indiv/remove                 controllers.MyIndividual.remove(indivname,proname ?= null,uid)
-PUT		/indiv/addrelation			controllers.MyIndividual.addRelation(id1,id2,uid)
+GET		/indiv/get					 controllers.MyIndividual.get(classname,uid)
+GET		/indiv/getpro		    	 controllers.MyIndividual.getProperties(indivname,proname ?= null,uid)
+PUT		/indiv/update                 controllers.MyIndividual.update()
+PUT		/indiv/getbylabel			  controllers.MyIndividual.getIndivByLabel()
+GET		/indiv/remove                 controllers.MyIndividual.remove()
+PUT		/indiv/addrelation			controllers.MyIndividual.addRelation()
