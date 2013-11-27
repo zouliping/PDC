@@ -3,8 +3,8 @@
 # ~~~~
 
 # Home page
-POST	/user/register				controllers.Application.registerUser()
-POST	/user/login					controllers.Application.login()
+PUT		/user/register				controllers.Application.registerUser()
+PUT		/user/login					controllers.Application.login()
 
 # Map static resources from the /public folder to the /assets URL path
 GET		/assets/*file               controllers.Assets.at(path="/public", file)
@@ -24,3 +24,4 @@ PUT		/indiv/update                 controllers.MyIndividual.update()
 PUT		/indiv/getbylabel			  controllers.MyIndividual.getIndivByLabel()
 GET		/indiv/remove                 controllers.MyIndividual.remove()
 PUT		/indiv/addrelation			controllers.MyIndividual.addRelation()
+PUT		/indiv/removerelation		controllers.MyIndividual.removeRelation()

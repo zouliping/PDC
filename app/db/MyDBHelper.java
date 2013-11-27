@@ -24,6 +24,9 @@ public class MyDBHelper {
 				+ "?useUnicode=true&characterEncoding=utf8";
 	}
 
+	/**
+	 * create the db for the user
+	 */
 	public void createDB() {
 		try {
 			String mUrl = "jdbc:mysql://localhost/testjena?useUnicode=true&characterEncoding=utf8";
@@ -40,7 +43,6 @@ public class MyDBHelper {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**

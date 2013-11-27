@@ -115,6 +115,39 @@ public class MyIndividual extends Controller {
 	}
 
 	/**
+	 * remove a relation between a individual and a individual
+	 * 
+	 * @return
+	 */
+	public static Result removeRelation() {
+		JsonNode json = request().body().asJson();
+		System.out.println(json);
+		String indivi1 = json.findPath("indivi1").textValue();
+		String indivi2 = json.findPath("indivi2").textValue();
+		String relation = json.findPath("relation").textValue();
+		UserUtil.uid = json.findPath("uid").textValue();
+
+		if (indivi1 == null || indivi2 == null || relation == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+
+		Individual i1 = model.getIndividual(prefix + indivi1);
+		Individual i2 = model.getIndividual(prefix + indivi2);
+		OntProperty op = model.getOntProperty(prefix + relation);
+
+		if (i1 == null || i2 == null || op == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+
+		StatementImpl stmt = new StatementImpl(i1, op, i2);
+		model.remove(stmt);
+		return ok(JsonUtil.getTrueJson());
+	}
+
+	/**
 	 * get a class's individuals
 	 * 
 	 * @param classname
