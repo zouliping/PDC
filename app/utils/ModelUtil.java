@@ -36,7 +36,7 @@ public class ModelUtil {
 		Model model = maker.createModel("pdc");
 
 		try {
-			File file = new File("./owl/OntologyPDC_test.owl");
+			File file = new File("./owl/OntologyPDC_pure.owl");
 			FileInputStream fis = new FileInputStream(file);
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			model.read(isr, null);
