@@ -26,13 +26,26 @@ public class Application extends Controller {
 	 */
 	public static Result login() {
 		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
 		UserUtil.uid = json.findPath("id").textValue();
 		String pwd = json.findPath("password").textValue();
 
-		OntModel model = MyOntModel.getInstance().getModel();
+		OntModel model = null;
+		try {
+			model = MyOntModel.getInstance().getModel();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return badRequest(JsonUtil.getFalseJson());
+		}
+
 		String prefix = model.getNsPrefixURI("");
 
 		Individual individual = model.getIndividual(prefix + UserUtil.uid);
+
+		if (individual == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+
 		OntProperty op = model.getOntProperty(prefix + "password");
 
 		if (pwd.equals(individual.getPropertyValue(op).toString())) {
