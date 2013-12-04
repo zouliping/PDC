@@ -6,16 +6,15 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import utils.JsonUtil;
 import utils.ModelUtil;
-import utils.MyOntModel;
 import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntProperty;
 
 import db.MyDBHelper;
+import db.MyDBManager;
 
 public class Application extends Controller {
 
@@ -30,25 +29,9 @@ public class Application extends Controller {
 		UserUtil.uid = json.findPath("id").textValue();
 		String pwd = json.findPath("password").textValue();
 
-		OntModel model = null;
-		try {
-			model = MyOntModel.getInstance().getModel();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return badRequest(JsonUtil.getFalseJson());
-		}
+		MyDBManager manager = new MyDBManager();
 
-		String prefix = model.getNsPrefixURI("");
-
-		Individual individual = model.getIndividual(prefix + UserUtil.uid);
-
-		if (individual == null) {
-			return badRequest(JsonUtil.getFalseJson());
-		}
-
-		OntProperty op = model.getOntProperty(prefix + "password");
-
-		if (pwd.equals(individual.getPropertyValue(op).toString())) {
+		if (manager.query("user", "uid", UserUtil.uid, pwd)) {
 			return ok(JsonUtil.getTrueJson());
 		} else {
 			return badRequest(JsonUtil.getFalseJson());
@@ -64,10 +47,14 @@ public class Application extends Controller {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		UserUtil.uid = json.findPath("id").textValue();
-		System.out.println(UserUtil.uid);
-		MyDBHelper helper = new MyDBHelper();
+		String pwd = json.findPath("password").textValue();
+
+		MyDBManager manager = new MyDBManager();
+		manager.insertIntoTable("user", "uid", UserUtil.uid, pwd);
 		// create a new db for a user
-		helper.createDB();
+		manager.createDB();
+
+		MyDBHelper helper = new MyDBHelper();
 
 		// store ontology in a new db
 		OntModel model = ModelUtil.createModel(helper.getConnection());

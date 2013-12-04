@@ -82,6 +82,8 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result addRelation() {
 		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
+
 		String id1 = json.findPath("id1").textValue();
 		String id2 = json.findPath("id2").textValue();
 		UserUtil.uid = json.findPath("uid").textValue();
@@ -305,6 +307,7 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result remove() {
 		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
 		String indivname = json.findPath("indivname").textValue();
 		String proname = json.findPath("proname").textValue();
 		UserUtil.uid = json.findPath("uid").textValue();

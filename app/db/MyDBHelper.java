@@ -1,9 +1,6 @@
 package db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import utils.UserUtil;
 
@@ -22,27 +19,6 @@ public class MyDBHelper {
 	public MyDBHelper() {
 		url = "jdbc:mysql://localhost/" + UserUtil.uid
 				+ "?useUnicode=true&characterEncoding=utf8";
-	}
-
-	/**
-	 * create the db for the user
-	 */
-	public void createDB() {
-		try {
-			String mUrl = "jdbc:mysql://localhost/testjena?useUnicode=true&characterEncoding=utf8";
-			Connection connection = DriverManager
-					.getConnection(mUrl, user, pwd);
-			Statement stmt = connection.createStatement();
-
-			// remember to set database character
-			stmt.executeUpdate("create database if not exists " + UserUtil.uid
-					+ " default character set utf8 collate utf8_bin");
-
-			stmt.close();
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

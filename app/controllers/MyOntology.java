@@ -115,6 +115,7 @@ public class MyOntology extends Controller {
 		String prefix = model.getNsPrefixURI("");
 
 		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
 		String classname = json.findPath("classname").textValue();
 
 		if (classname == null) {
