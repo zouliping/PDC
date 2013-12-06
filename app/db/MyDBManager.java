@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import utils.UserUtil;
 
@@ -84,6 +85,27 @@ public class MyDBManager {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * get all users' id
+	 * 
+	 * @return
+	 */
+	public ArrayList<String> getAllUsers() {
+		String sql = "SELECT uid FROM user";
+		ArrayList<String> userList = new ArrayList<String>();
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				String user = rs.getString(1);
+				userList.add(user);
+			}
+			return userList;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**

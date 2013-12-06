@@ -67,12 +67,17 @@ public class Application extends Controller {
 		ModelUtil.addIndividualProperties(oUser, iUser, it, json);
 		return ok(JsonUtil.getTrueJson());
 	}
-	
-	public static Result registerApp(){
+
+	/**
+	 * register a app
+	 * 
+	 * @return
+	 */
+	public static Result registerApp() {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
-		String sname = json.findPath("sname").textValue();
-		
+		// String sname = json.findPath("sname").textValue();
+
 		return ok();
 	}
 }

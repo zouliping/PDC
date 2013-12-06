@@ -14,12 +14,16 @@ import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+
+import db.MyDBManager;
 
 public class MyOntology extends Controller {
 
@@ -111,9 +115,6 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result add() {
-		OntModel model = MyOntModel.getInstance().getModel();
-		String prefix = model.getNsPrefixURI("");
-
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String classname = json.findPath("classname").textValue();
@@ -122,19 +123,70 @@ public class MyOntology extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		OntClass oc = model.createClass(prefix + classname);
-		JsonNode array = json.findPath("attr");
-		OntProperty op;
+		MyDBManager manager = new MyDBManager();
+		ArrayList<String> userList = manager.getAllUsers();
 
-		if (array.isArray()) {
-			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
-				JsonNode attr = it.next();
-				op = model.createOntProperty(prefix + attr.textValue());
-				// attach a property to a class
-				op.addDomain(oc);
+		for (String tmp : userList) {
+			UserUtil.uid = tmp;
+
+			OntModel model = MyOntModel.getInstance().getModel();
+			String prefix = model.getNsPrefixURI("");
+
+			OntClass oc = model.createClass(prefix + classname);
+			JsonNode array = json.findPath("attr");
+			OntProperty op;
+
+			if (array.isArray()) {
+				for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
+					JsonNode attr = it.next();
+					op = model.createOntProperty(prefix + attr.textValue());
+					// attach a property to a class
+					op.addDomain(oc);
+				}
+				MyOntModel.getInstance().updateModel(model);
 			}
+		}
+		return ok(JsonUtil.getTrueJson());
+	}
+
+	/**
+	 * add relation between a class and a class
+	 * 
+	 * @return
+	 */
+	public static Result addRelation() {
+		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
+		String class1 = json.findPath("class1").textValue();
+		String class2 = json.findPath("class2").textValue();
+		String relation = json.findPath("relation").textValue();
+
+		if (class1 == null || class2 == null || relation == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+
+		MyDBManager manager = new MyDBManager();
+		ArrayList<String> userList = manager.getAllUsers();
+
+		for (String tmp : userList) {
+			UserUtil.uid = tmp;
+			System.out.println(tmp);
+			OntModel model = MyOntModel.getInstance().getModel();
+			String prefix = model.getNsPrefixURI("");
+
+			OntClass ontClass1 = model.getOntClass(prefix + class1);
+			OntClass ontClass2 = model.getOntClass(prefix + class2);
+			ObjectProperty op = model.createObjectProperty(prefix + relation);
+
+			if (ontClass1 == null || ontClass2 == null) {
+				return badRequest(JsonUtil.getFalseJson());
+			}
+
+			StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
+			model.add(stmt);
 			MyOntModel.getInstance().updateModel(model);
 		}
+
 		return ok(JsonUtil.getTrueJson());
 	}
 }

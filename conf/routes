@@ -16,6 +16,7 @@ GET		/onto/all					controllers.MyOntology.all()
 GET		/onto/get                    controllers.MyOntology.getProperties(classname,uid)
 GET		/onto/relation				controllers.MyOntology.getRelation(classname1,classname2,uid)
 PUT		/onto/add					controllers.MyOntology.add()
+PUT		/onto/addrelation			controllers.MyOntology.addRelation()
 
 #MyIndividual
 GET		/indiv/get					 controllers.MyIndividual.get(classname,uid)
