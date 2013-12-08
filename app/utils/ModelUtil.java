@@ -154,7 +154,7 @@ public class ModelUtil {
 			String value = json.findPath(tmp).textValue();
 
 			if (value != null) {
-				System.out.println("op--" + tmp + "   value---" + value);
+				System.out.println("op:" + tmp + "   value:" + value);
 				i.addProperty(op, value);
 			}
 		}
