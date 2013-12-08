@@ -56,22 +56,26 @@ public class MyIndividual extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		Individual i = oc.createIndividual(prefix + individualname);
-		// if (individualname == null || "".equals(individualname)) {
-		// i = oc.createIndividual(prefix + json.findPath("id").textValue());
-		// } else {
-		// i = model.getIndividual(prefix + individualname);
-		// }
+		Individual i = model.getIndividual(prefix + individualname);
+		if (i == null) {
+			System.out.println("create indiv");
+			i = oc.createIndividual(prefix + individualname);
+		}
 
 		Iterator<String> it;
+		ArrayList<String> newList = new ArrayList<String>();
 		for (it = json.fieldNames(); it.hasNext();) {
 			String pro = it.next();
 			if ("classname".equals(pro) || "individualname".equals(pro)
 					|| "uid".equals(pro)) {
-				it.remove();
+			} else {
+				System.out.println(pro);
+				newList.add(pro);
 			}
 		}
-		ModelUtil.addIndividualProperties(oc, i, it, json);
+		if (newList.size() > 0) {
+			ModelUtil.addIndividualProperties(oc, i, newList, json);
+		}
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -113,6 +117,8 @@ public class MyIndividual extends Controller {
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
 		model.add(stmt);
 
+		MyOntModel.getInstance().updateModel(model);
+
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -146,6 +152,9 @@ public class MyIndividual extends Controller {
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
 		model.remove(stmt);
+
+		MyOntModel.getInstance().updateModel(model);
+
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -200,6 +209,9 @@ public class MyIndividual extends Controller {
 			}
 		} else {
 			OntProperty op = model.getOntProperty(prefix + proname);
+			if (individual.getPropertyValue(op) == null) {
+				return badRequest(JsonUtil.getFalseJson());
+			}
 			on.put(proname, individual.getPropertyValue(op).toString());
 		}
 		return ok(on);

@@ -151,16 +151,15 @@ public class ModelUtil {
 
 		for (String tmp : proList) {
 			op = model.getOntProperty(pre + tmp);
-
 			String value = json.findPath(tmp).textValue();
 
 			if (value != null) {
-				i.addProperty(op, pre + value);
+				System.out.println("op--" + tmp + "   value---" + value);
+				i.addProperty(op, value);
 			}
 		}
 
 		MyOntModel.getInstance().updateModel(model);
-
 		return true;
 	}
 
@@ -193,7 +192,6 @@ public class ModelUtil {
 				}
 			}
 		}
-
 		MyOntModel.getInstance().updateModel(model);
 		return true;
 	}
