@@ -153,8 +153,15 @@ public class ModelUtil {
 			op = model.getOntProperty(pre + tmp);
 			String value = json.findPath(tmp).textValue();
 
+			if (op == null) {
+				return false;
+			}
+
 			if (value != null) {
 				System.out.println("op:" + tmp + "   value:" + value);
+				if (i.getPropertyValue(op) != null) {
+					i.removeProperty(op, i.getPropertyValue(op));
+				}
 				i.addProperty(op, value);
 			}
 		}
