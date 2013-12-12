@@ -226,6 +226,8 @@ public class MyIndividual extends Controller {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
+		UserUtil.uid = json.findPath("uid").textValue();
+
 		OntModel model = MyOntModel.getInstance().getModel();
 
 		// Get prefixes
@@ -248,6 +250,7 @@ public class MyIndividual extends Controller {
 			queryString += "}";
 		}
 
+		System.out.println(queryString);
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
 		Boolean isClass = json.path("isClass").asBoolean();
@@ -256,6 +259,7 @@ public class MyIndividual extends Controller {
 		while (resultSet.hasNext()) {
 			QuerySolution result = resultSet.nextSolution();
 			String name = result.get("tmp").toString();
+			System.out.println(name);
 
 			// deal with class label
 			if (isClass) {
@@ -268,6 +272,8 @@ public class MyIndividual extends Controller {
 						StatementImpl sti = (StatementImpl) st.next();
 						tmp.put(sti.getPredicate().getLocalName(), sti
 								.getObject().toString());
+						System.out.println(sti.getPredicate().getLocalName()
+								+ "___" + sti.getObject().toString());
 					}
 					re.put(i.getLocalName(), tmp);
 				}

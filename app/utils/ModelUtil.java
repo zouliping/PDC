@@ -36,7 +36,7 @@ public class ModelUtil {
 		Model model = maker.createModel("pdc");
 
 		try {
-			File file = new File("./owl/OntologyPDC_pure.owl");
+			File file = new File("./owl/OntologyPDC_test.owl");
 			FileInputStream fis = new FileInputStream(file);
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			model.read(isr, null);
@@ -151,18 +151,23 @@ public class ModelUtil {
 
 		for (String tmp : proList) {
 			op = model.getOntProperty(pre + tmp);
-			String value = json.findPath(tmp).textValue();
 
-			if (op == null) {
-				return false;
-			}
-
-			if (value != null) {
-				System.out.println("op:" + tmp + "   value:" + value);
-				if (i.getPropertyValue(op) != null) {
-					i.removeProperty(op, i.getPropertyValue(op));
+			if (op != null) {
+				String value = json.findPath(tmp).textValue();
+				if (value != null) {
+					System.out.println("op:" + tmp + "   value:" + value);
+					if ((i.getPropertyValue(op)) != null) {
+						i.removeProperty(op, i.getPropertyValue(op));
+					}
+					i.addProperty(op, value);
+				} else {
+					value = json.findPath(tmp).booleanValue() + "";
+					System.out.println("op:" + tmp + "   value:" + value);
+					if ((i.getPropertyValue(op)) != null) {
+						i.removeProperty(op, i.getPropertyValue(op));
+					}
+					i.addProperty(op, value);
 				}
-				i.addProperty(op, value);
 			}
 		}
 
