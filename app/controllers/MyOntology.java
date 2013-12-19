@@ -10,7 +10,6 @@ import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.QueryUtil;
-import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,8 +21,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-
-import db.MyDBManager;
 
 public class MyOntology extends Controller {
 
@@ -56,8 +53,7 @@ public class MyOntology extends Controller {
 	 * @param classname
 	 * @return
 	 */
-	public static Result getProperties(String classname, String uid) {
-		UserUtil.uid = uid;
+	public static Result getProperties(String classname) {
 		ArrayList<String> proList = ModelUtil.getPropertyList(classname);
 
 		if (proList == null) {
@@ -74,9 +70,7 @@ public class MyOntology extends Controller {
 	 * @param classname2
 	 * @return
 	 */
-	public static Result getRelation(String classname1, String classname2,
-			String uid) {
-		UserUtil.uid = uid;
+	public static Result getRelation(String classname1, String classname2) {
 		model = MyOntModel.getInstance().getModel();
 		String defaultPrefix = model.getNsPrefixURI("");
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
@@ -123,28 +117,21 @@ public class MyOntology extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		MyDBManager manager = new MyDBManager();
-		ArrayList<String> userList = manager.getAllUsers();
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
 
-		for (String tmp : userList) {
-			UserUtil.uid = tmp;
+		OntClass oc = model.createClass(prefix + classname);
+		JsonNode array = json.findPath("attr");
+		OntProperty op;
 
-			OntModel model = MyOntModel.getInstance().getModel();
-			String prefix = model.getNsPrefixURI("");
-
-			OntClass oc = model.createClass(prefix + classname);
-			JsonNode array = json.findPath("attr");
-			OntProperty op;
-
-			if (array.isArray()) {
-				for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
-					JsonNode attr = it.next();
-					op = model.createOntProperty(prefix + attr.textValue());
-					// attach a property to a class
-					op.addDomain(oc);
-				}
-				MyOntModel.getInstance().updateModel(model);
+		if (array.isArray()) {
+			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
+				JsonNode attr = it.next();
+				op = model.createOntProperty(prefix + attr.textValue());
+				// attach a property to a class
+				op.addDomain(oc);
 			}
+			MyOntModel.getInstance().updateModel(model);
 		}
 		return ok(JsonUtil.getTrueJson());
 	}
@@ -165,27 +152,20 @@ public class MyOntology extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		MyDBManager manager = new MyDBManager();
-		ArrayList<String> userList = manager.getAllUsers();
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
 
-		for (String tmp : userList) {
-			UserUtil.uid = tmp;
-			System.out.println(tmp);
-			OntModel model = MyOntModel.getInstance().getModel();
-			String prefix = model.getNsPrefixURI("");
+		OntClass ontClass1 = model.getOntClass(prefix + class1);
+		OntClass ontClass2 = model.getOntClass(prefix + class2);
+		ObjectProperty op = model.createObjectProperty(prefix + relation);
 
-			OntClass ontClass1 = model.getOntClass(prefix + class1);
-			OntClass ontClass2 = model.getOntClass(prefix + class2);
-			ObjectProperty op = model.createObjectProperty(prefix + relation);
-
-			if (ontClass1 == null || ontClass2 == null) {
-				return badRequest(JsonUtil.getFalseJson());
-			}
-
-			StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
-			model.add(stmt);
-			MyOntModel.getInstance().updateModel(model);
+		if (ontClass1 == null || ontClass2 == null) {
+			return badRequest(JsonUtil.getFalseJson());
 		}
+
+		StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
+		model.add(stmt);
+		MyOntModel.getInstance().updateModel(model);
 
 		return ok(JsonUtil.getTrueJson());
 	}

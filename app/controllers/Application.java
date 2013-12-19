@@ -56,7 +56,7 @@ public class Application extends Controller {
 		MyDBManager manager = new MyDBManager();
 		manager.insertIntoTable("user", "uid", UserUtil.uid, pwd);
 		// create a new db for a user
-		manager.createDB();
+		// manager.createDB();
 
 		MyDBHelper helper = new MyDBHelper();
 

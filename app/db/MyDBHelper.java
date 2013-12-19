@@ -2,24 +2,17 @@ package db;
 
 import java.sql.SQLException;
 
-import utils.UserUtil;
-
 import com.hp.hpl.jena.db.DBConnection;
 
 public class MyDBHelper {
 
 	private final static String driver = "com.mysql.jdbc.Driver";
-	private static String url;
+	private static String url = "jdbc:mysql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
 	private final static String db = "MySQL";
 	private final static String user = "root";
 	private final static String pwd = "123456";
 
 	private DBConnection con;
-
-	public MyDBHelper() {
-		url = "jdbc:mysql://localhost/" + UserUtil.uid
-				+ "?useUnicode=true&characterEncoding=utf8";
-	}
 
 	/**
 	 * get db connection
