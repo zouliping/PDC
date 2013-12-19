@@ -19,7 +19,7 @@ import db.MyDBManager;
 public class Application extends Controller {
 
 	public static Result index() {
-		return ok("test zlp heroku deploy");
+		return ok("test heroku deploy");
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class Application extends Controller {
 		String pwd = json.findPath("password").textValue();
 
 		MyDBManager manager = new MyDBManager();
-		manager.insertIntoTable("user", "uid", UserUtil.uid, pwd);
+		manager.insertIntoTable("User_t", "uid", UserUtil.uid, pwd);
 		// create a new db for a user
 		// manager.createDB();
 

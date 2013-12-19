@@ -12,8 +12,8 @@ import utils.UserUtil;
 
 public class MyDBManager {
 
-	private final static String driver = "com.mysql.jdbc.Driver";
-	private static String url = "jdbc:mysql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
+	private final static String driver = "org.postgresql.Driver";
+	private static String url = "jdbc:postgresql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
 	private final static String user = "root";
 	private final static String pwd = "123456";
 	private Connection con;
