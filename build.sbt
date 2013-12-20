@@ -5,7 +5,7 @@ version := "1.0-SNAPSHOT"
 libraryDependencies ++= Seq(
   javaJdbc,
   javaEbean,
-  cache,
+  cache
 )     
 
 play.Project.playJavaSettings
