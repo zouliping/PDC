@@ -54,7 +54,7 @@ public class Application extends Controller {
 		String pwd = json.findPath("password").textValue();
 
 		MyDBManager manager = new MyDBManager();
-		manager.insertIntoTable("User_t", "uid", UserUtil.uid, pwd);
+		manager.insertIntoTable("users", "uid", UserUtil.uid, pwd);
 		// create a new db for a user
 		// manager.createDB();
 
