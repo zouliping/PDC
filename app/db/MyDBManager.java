@@ -14,7 +14,7 @@ import utils.UserUtil;
 
 public class MyDBManager {
 
-	// private final static String driver = "org.postgresql.Driver";
+	private final static String driver = "org.postgresql.Driver";
 	// private static String url =
 	// "jdbc:postgresql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
 	// private final static String user = "zouliping";
@@ -35,12 +35,14 @@ public class MyDBManager {
 			url = "jdbc:postgresql://" + dbUri.getHost() + ':'
 					+ dbUri.getPort() + dbUri.getPath();
 
-			// Class.forName(driver);
+			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, pwd);
 			stmt = con.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
