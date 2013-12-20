@@ -19,7 +19,7 @@ import db.MyDBManager;
 public class Application extends Controller {
 
 	public static Result index() {
-		return ok("test heroku deploy");
+		return ok("hello pdc");
 	}
 
 	/**
