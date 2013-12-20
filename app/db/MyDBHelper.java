@@ -8,7 +8,7 @@ import com.hp.hpl.jena.db.DBConnection;
 
 public class MyDBHelper {
 
-	private final static String driver = "org.postgresql.Driver";
+//	private final static String driver = "org.postgresql.Driver";
 	// private static String url =
 	// "jdbc:postgresql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
 	// private final static String db = "MySQL";
@@ -19,9 +19,6 @@ public class MyDBHelper {
 	private static String url;
 	private static String user;
 	private static String pwd;
-
-	// private final static String db_url =
-	// "postgres://ffvtcujmlleplt:hlmxYInnbmNIR2c6rW7TH3ldS3@ec2-54-225-101-18.compute-1.amazonaws.com:5432/d5p1jrg291roqq";
 
 	private DBConnection con;
 
@@ -47,11 +44,11 @@ public class MyDBHelper {
 	 * @return
 	 */
 	public DBConnection getConnection() {
-		try {
-			Class.forName(driver);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// Class.forName(driver);
+		// } catch (ClassNotFoundException e) {
+		// e.printStackTrace();
+		// }
 		con = new DBConnection(url, user, pwd, db);
 		return con;
 	}

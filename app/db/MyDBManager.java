@@ -22,9 +22,7 @@ public class MyDBManager {
 	private String url;
 	private static String user;
 	private static String pwd;
-	// private final static String db_url =
-	// //
-	// "postgres://ffvtcujmlleplt:hlmxYInnbmNIR2c6rW7TH3ldS3@ec2-54-225-101-18.compute-1.amazonaws.com:5432/d5p1jrg291roqq";
+	
 	private Connection con;
 	private Statement stmt;
 	private PreparedStatement ps;
