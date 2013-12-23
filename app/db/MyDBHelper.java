@@ -1,19 +1,14 @@
 package db;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
+
+import utils.DatabaseConfig;
 
 import com.hp.hpl.jena.db.DBConnection;
 
 public class MyDBHelper {
 
 	private final static String driver = "org.postgresql.Driver";
-	// private static String url =
-	// "jdbc:postgresql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
-	// private final static String db = "MySQL";
-	// private final static String user = "zouliping";
-	// private final static String pwd = "postgres";
 
 	private final static String db = "PostgreSQL";
 	private static String url;
@@ -23,15 +18,10 @@ public class MyDBHelper {
 	private DBConnection con;
 
 	public MyDBHelper() {
-		try {
-			URI dbUri = new URI(System.getenv("DATABASE_URL"));
-			user = dbUri.getUserInfo().split(":")[0];
-			pwd = dbUri.getUserInfo().split(":")[1];
-			url = "jdbc:postgresql://" + dbUri.getHost() + ':'
-					+ dbUri.getPort() + dbUri.getPath();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+		DatabaseConfig.isLocal = true;
+		url = DatabaseConfig.url;
+		user = DatabaseConfig.user;
+		pwd = DatabaseConfig.pwd;
 	}
 
 	/**

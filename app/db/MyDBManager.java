@@ -1,7 +1,5 @@
 package db;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,15 +8,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import utils.DatabaseConfig;
 import utils.UserUtil;
 
 public class MyDBManager {
 
 	private final static String driver = "org.postgresql.Driver";
-	// private static String url =
-	// "jdbc:postgresql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
-	// private final static String user = "zouliping";
-	// private final static String pwd = "postgres";
 	private String url;
 	private static String user;
 	private static String pwd;
@@ -29,18 +24,15 @@ public class MyDBManager {
 
 	public MyDBManager() {
 		try {
-			URI dbUri = new URI(System.getenv("DATABASE_URL"));
-			user = dbUri.getUserInfo().split(":")[0];
-			pwd = dbUri.getUserInfo().split(":")[1];
-			url = "jdbc:postgresql://" + dbUri.getHost() + ':'
-					+ dbUri.getPort() + dbUri.getPath();
+			DatabaseConfig.isLocal = true;
+			url = DatabaseConfig.url;
+			user = DatabaseConfig.user;
+			pwd = DatabaseConfig.pwd;
 
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, user, pwd);
 			stmt = con.createStatement();
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
