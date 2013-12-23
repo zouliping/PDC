@@ -6,9 +6,9 @@ import java.net.URISyntaxException;
 public class DatabaseConfig {
 
 	public static Boolean isLocal = true;
-	public static String url;
-	public static String user;
-	public static String pwd;
+	public static String url = "jdbc:postgresql://localhost/pdc?useUnicode=true&characterEncoding=utf8";
+	public static String user = "zouliping";
+	public static String pwd = "postgres";
 
 	public static void set() {
 		if (isLocal) {
@@ -22,7 +22,8 @@ public class DatabaseConfig {
 				user = dbUri.getUserInfo().split(":")[0];
 				pwd = dbUri.getUserInfo().split(":")[1];
 				url = "jdbc:postgresql://" + dbUri.getHost() + ':'
-						+ dbUri.getPort() + dbUri.getPath();
+						+ dbUri.getPort() + dbUri.getPath()
+						+ "?useUnicode=true&characterEncoding=utf8";
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}

@@ -19,6 +19,7 @@ public class MyDBHelper {
 
 	public MyDBHelper() {
 		DatabaseConfig.isLocal = true;
+		DatabaseConfig.set();
 		url = DatabaseConfig.url;
 		user = DatabaseConfig.user;
 		pwd = DatabaseConfig.pwd;
