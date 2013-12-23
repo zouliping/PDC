@@ -67,6 +67,7 @@ public class Application extends Controller {
 		String prefix = model.getNsPrefixURI("");
 		OntClass oUser = model.getOntClass(prefix + UserUtil.userClassname);
 		Individual iUser = oUser.createIndividual(prefix + UserUtil.uid);
+		iUser.addLabel(UserUtil.uid, null);
 		Iterator<String> it = json.fieldNames();
 		ModelUtil.addIndividualProperties(oUser, iUser, it, json);
 		return ok(JsonUtil.getTrueJson());

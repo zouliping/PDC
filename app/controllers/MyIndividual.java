@@ -62,6 +62,9 @@ public class MyIndividual extends Controller {
 			i = oc.createIndividual(prefix + individualname);
 		}
 
+		// set user label
+		i.addLabel(UserUtil.uid, null);
+
 		Iterator<String> it;
 		ArrayList<String> newList = new ArrayList<String>();
 		for (it = json.fieldNames(); it.hasNext();) {
@@ -69,7 +72,6 @@ public class MyIndividual extends Controller {
 			if ("classname".equals(pro) || "individualname".equals(pro)
 					|| "uid".equals(pro)) {
 			} else {
-				System.out.println(pro);
 				newList.add(pro);
 			}
 		}
@@ -177,9 +179,11 @@ public class MyIndividual extends Controller {
 
 		for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
 			Individual individual = (Individual) i.next();
-			indivList.add(individual.getLocalName());
+			System.out.println(individual.getLocalName());
+			if (ModelUtil.isUserIndiv(individual)) {
+				indivList.add(individual.getLocalName());
+			}
 		}
-
 		return ok(JsonUtil.addList2Json(classname, indivList));
 	}
 
@@ -266,16 +270,21 @@ public class MyIndividual extends Controller {
 				OntClass oc = model.getOntClass(name);
 				for (ExtendedIterator<?> ei = oc.listInstances(); ei.hasNext();) {
 					Individual i = (Individual) ei.next();
-					ObjectNode tmp = Json.newObject();
 
-					for (StmtIterator st = i.listProperties(); st.hasNext();) {
-						StatementImpl sti = (StatementImpl) st.next();
-						tmp.put(sti.getPredicate().getLocalName(), sti
-								.getObject().toString());
-						System.out.println(sti.getPredicate().getLocalName()
-								+ "___" + sti.getObject().toString());
+					if (ModelUtil.isUserIndiv(i)) {
+						ObjectNode tmp = Json.newObject();
+
+						for (StmtIterator st = i.listProperties(); st.hasNext();) {
+							StatementImpl sti = (StatementImpl) st.next();
+							tmp.put(sti.getPredicate().getLocalName(), sti
+									.getObject().toString());
+							System.out.println(sti.getPredicate()
+									.getLocalName()
+									+ "___"
+									+ sti.getObject().toString());
+						}
+						re.put(i.getLocalName(), tmp);
 					}
-					re.put(i.getLocalName(), tmp);
 				}
 				// deal with property label
 			} else {
@@ -303,12 +312,14 @@ public class MyIndividual extends Controller {
 					for (ExtendedIterator<?> ei2 = tmpClass.listInstances(); ei2
 							.hasNext();) {
 						Individual individual = (Individual) ei2.next();
-						ObjectNode onNode = Json.newObject();
-						if ((individual.getPropertyValue(op)) != null) {
-							onNode.put(name, individual.getPropertyValue(op)
-									.toString());
+						if (ModelUtil.isUserIndiv(individual)) {
+							ObjectNode onNode = Json.newObject();
+							if ((individual.getPropertyValue(op)) != null) {
+								onNode.put(name, individual
+										.getPropertyValue(op).toString());
+							}
+							re.put(individual.getLocalName(), onNode);
 						}
-						re.put(individual.getLocalName(), onNode);
 					}
 				}
 			}

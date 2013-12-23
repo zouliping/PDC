@@ -267,4 +267,21 @@ public class ModelUtil {
 		QueryUtil.closeQE();
 		return relationValue;
 	}
+
+	/**
+	 * To judge is user's individual
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public static Boolean isUserIndiv(Individual i) {
+		System.out.println(i.getLabel(null));
+		if ((UserUtil.uid).equals(i.getLabel(null))
+				|| (UserUtil.uid + "^^<http://www.w3.org/2001/XMLSchema#string>")
+						.equals(i.getLabel(null))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
