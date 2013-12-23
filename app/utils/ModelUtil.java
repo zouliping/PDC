@@ -275,10 +275,10 @@ public class ModelUtil {
 	 * @return
 	 */
 	public static Boolean isUserIndiv(Individual i) {
-		System.out.println(i.getLabel(null));
-		if ((UserUtil.uid).equals(i.getLabel(null))
-				|| (UserUtil.uid + "^^<http://www.w3.org/2001/XMLSchema#string>")
-						.equals(i.getLabel(null))) {
+		if (i.hasLabel(UserUtil.uid, null)
+				|| i.hasLabel(
+						(UserUtil.uid + "^^<http://www.w3.org/2001/XMLSchema#string>"),
+						null)) {
 			return true;
 		} else {
 			return false;
