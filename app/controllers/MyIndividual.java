@@ -65,6 +65,9 @@ public class MyIndividual extends Controller {
 		// set user label
 		i.addLabel(UserUtil.uid, null);
 
+		String old_location;
+		String new_location;
+
 		Iterator<String> it;
 		ArrayList<String> newList = new ArrayList<String>();
 		for (it = json.fieldNames(); it.hasNext();) {
@@ -72,12 +75,30 @@ public class MyIndividual extends Controller {
 			if ("classname".equals(pro) || "individualname".equals(pro)
 					|| "uid".equals(pro)) {
 			} else {
+				if (("User".equals(classname))
+						&& ("current_location".equals(pro))) {
+					new_location = json.findPath(pro).textValue();
+					Individual individual = model.getIndividual(prefix
+							+ UserUtil.uid);
+					OntProperty op = model.getOntProperty(prefix + pro);
+					if (individual.getPropertyValue(op) != null) {
+						old_location = individual.getPropertyValue(op)
+								.toString();
+						if (new_location != null && old_location != null
+								&& !(new_location.equals(old_location))) {
+							UserUtil.sendNotification(old_location,
+									new_location);
+						}
+					}
+
+				}
 				newList.add(pro);
 			}
 		}
 		if (newList.size() > 0) {
 			ModelUtil.addIndividualProperties(oc, i, newList, json);
 		}
+
 		return ok(JsonUtil.getTrueJson());
 	}
 

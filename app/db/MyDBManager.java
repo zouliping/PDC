@@ -100,11 +100,14 @@ public class MyDBManager {
 	 * @return
 	 */
 	public Boolean query(String tableName, String idName, String id, String pwd) {
-		String sql = "SELECT * FROM " + tableName + " WHERE " + idName + "=\""
-				+ id + "\" and pwd=\"" + pwd + "\"";
+		String sql = "SELECT * FROM " + tableName + " WHERE " + idName + "=\'"
+				+ id + "\' and pwd=\'" + pwd + "\'";
 		System.out.println(sql);
 		try {
-			ResultSet rs = stmt.executeQuery(sql);
+			Statement statement = con.createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = statement.executeQuery(sql);
 			if (rs.first()) {
 				return true;
 			}

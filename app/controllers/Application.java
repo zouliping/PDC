@@ -35,7 +35,7 @@ public class Application extends Controller {
 
 		MyDBManager manager = new MyDBManager();
 
-		if (manager.query("user", "uid", UserUtil.uid, pwd)) {
+		if (manager.query("users", "uid", UserUtil.uid, pwd)) {
 			return ok(JsonUtil.getTrueJson());
 		} else {
 			return badRequest(JsonUtil.getFalseJson());
