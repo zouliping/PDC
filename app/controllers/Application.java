@@ -81,8 +81,12 @@ public class Application extends Controller {
 	public static Result registerApp() {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
-		// String sname = json.findPath("sname").textValue();
+		String sname = json.findPath("name").textValue();
+		String packagename = json.findPath("packagename").textValue();
 
-		return ok();
+		MyDBManager manager = new MyDBManager();
+		manager.insertIntoServiceTable(sname, packagename);
+
+		return ok(JsonUtil.getTrueJson());
 	}
 }

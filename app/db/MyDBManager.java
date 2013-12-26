@@ -73,6 +73,25 @@ public class MyDBManager {
 	}
 
 	/**
+	 * insert a data into service table
+	 * 
+	 * @param name
+	 * @param packagename
+	 * @param appkey
+	 */
+	public void insertIntoServiceTable(String name, String packagename) {
+		String sql = "INSERT INTO service (name, packagename) values (?,?,?)";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setString(1, name);
+			ps.setString(2, packagename);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * query user or admin table to find uid and pwd
 	 * 
 	 * @param tableName
