@@ -80,7 +80,7 @@ public class MyDBManager {
 	 * @param appkey
 	 */
 	public void insertIntoServiceTable(String name, String packagename) {
-		String sql = "INSERT INTO service (name, packagename) values (?,?,?)";
+		String sql = "INSERT INTO service (name, packagename) values (?,?)";
 		try {
 			ps = con.prepareStatement(sql);
 			ps.setString(1, name);
