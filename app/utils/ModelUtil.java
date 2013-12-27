@@ -269,6 +269,34 @@ public class ModelUtil {
 	}
 
 	/**
+	 * get followers
+	 * 
+	 * @return
+	 */
+	public static ArrayList<String> getFollowers() {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String defaultPrefix = model.getNsPrefixURI("");
+		String rdfsPrefix = model.getNsPrefixURI("rdfs");
+		String owlPrefix = model.getNsPrefixURI("owl");
+		ArrayList<String> users = new ArrayList<String>();
+
+		// Create a new query
+		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
+				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
+				+ owlPrefix + ">\n" + "SELECT ?user\n" + "WHERE { default:"
+				+ UserUtil.uid + " default:follow ?user }";
+
+		ResultSet results = QueryUtil.doQuery(model, queryString);
+
+		while (results.hasNext()) {
+			QuerySolution result = results.nextSolution();
+			String user = result.get("user").toString();
+			users.add(user);
+		}
+		return users;
+	}
+
+	/**
 	 * To judge is user's individual
 	 * 
 	 * @param i

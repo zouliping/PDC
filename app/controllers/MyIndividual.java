@@ -2,6 +2,7 @@ package controllers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -123,19 +124,33 @@ public class MyIndividual extends Controller {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		String relation = ModelUtil.getRelation(classname1, classname2);
-		if (relation == null) {
-			relation = ModelUtil.getRelation(classname2, classname1);
-			String tmp = id1;
-			id1 = id2;
-			id2 = tmp;
-		}
-		System.out.println(relation);
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
+		String relation = "";
+
+		// add follow between user and user
+		if (UserUtil.userClassname.equals(classname1)
+				&& UserUtil.userClassname.equals(classname2)) {
+			relation = prefix + "follow";
+		} else {
+			// get relation between cls1 and cls2
+			relation = ModelUtil.getRelation(classname1, classname2);
+			if (relation == null) {
+				relation = ModelUtil.getRelation(classname2, classname1);
+				String tmp = id1;
+				id1 = id2;
+				id2 = tmp;
+			}
+		}
+		System.out.println(relation);
 		Individual i1 = model.getIndividual(prefix + id1);
 		Individual i2 = model.getIndividual(prefix + id2);
+
 		ObjectProperty op = model.getObjectProperty(relation);
+
+		if (op == null) {
+			return badRequest(JsonUtil.getFalseJson());
+		}
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
 		model.add(stmt);
@@ -192,20 +207,44 @@ public class MyIndividual extends Controller {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		OntClass oc = model.getOntClass(prefix + classname);
-		ArrayList<String> indivList = new ArrayList<String>();
+		ObjectNode on = Json.newObject();
 
 		if (oc == null) {
 			return badRequest(JsonUtil.getFalseJson());
 		}
 
-		for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
-			Individual individual = (Individual) i.next();
-			System.out.println(individual.getLocalName());
-			if (ModelUtil.isUserIndiv(individual)) {
-				indivList.add(individual.getLocalName());
+		// get user's followers
+		if (UserUtil.userClassname.equals(classname)) {
+			List<String> followers = ModelUtil.getFollowers();
+			for (String tmp : followers) {
+				System.out.println(tmp);
+				Individual iFollower = model.getIndividual(tmp);
+				ObjectNode proNode = Json.newObject();
+				for (StmtIterator si = iFollower.listProperties(); si.hasNext();) {
+					StatementImpl sti = (StatementImpl) si.next();
+					proNode.put(sti.getPredicate().getLocalName(), sti
+							.getObject().toString());
+				}
+				on.put(iFollower.getLocalName(), proNode);
+			}
+			// get class's individuals
+		} else {
+			for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
+				Individual individual = (Individual) i.next();
+				System.out.println(individual.getLocalName());
+				if (ModelUtil.isUserIndiv(individual)) {
+					ObjectNode proNode = Json.newObject();
+					for (StmtIterator si = individual.listProperties(); si
+							.hasNext();) {
+						StatementImpl sti = (StatementImpl) si.next();
+						proNode.put(sti.getPredicate().getLocalName(), sti
+								.getObject().toString());
+					}
+					on.put(individual.getLocalName(), proNode);
+				}
 			}
 		}
-		return ok(JsonUtil.addList2Json(classname, indivList));
+		return ok(on);
 	}
 
 	/**
