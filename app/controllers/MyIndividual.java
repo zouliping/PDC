@@ -217,7 +217,7 @@ public class MyIndividual extends Controller {
 		if (UserUtil.userClassname.equals(classname)) {
 			List<String> followers = ModelUtil.getFollowers();
 			for (String tmp : followers) {
-				System.out.println(tmp);
+				// System.out.println(tmp);
 				Individual iFollower = model.getIndividual(tmp);
 				ObjectNode proNode = Json.newObject();
 				for (StmtIterator si = iFollower.listProperties(); si.hasNext();) {
@@ -332,7 +332,7 @@ public class MyIndividual extends Controller {
 				OntClass oc = model.getOntClass(name);
 				for (ExtendedIterator<?> ei = oc.listInstances(); ei.hasNext();) {
 					Individual i = (Individual) ei.next();
-
+					System.out.println(i.getLocalName());
 					if (ModelUtil.isUserIndiv(i)) {
 						ObjectNode tmp = Json.newObject();
 

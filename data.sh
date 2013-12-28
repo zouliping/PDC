@@ -1,0 +1,4 @@
+curl --header "Content-type: application/json" --request PUT --data '{"id":"zlp","nick":"zlp","password":"zlp","birthday":"1992-08-03","location":"harbin"}' http://192.168.0.108:9000/user/register
+curl --header "Content-type: application/json" --request PUT --data '{"classname":"Goods","individualname":"goods1","uid":"zlp","title":"goods1","description":"this is a goods","goods_type":"Food"}' http://192.168.0.108:9000/indiv/update
+curl --header "Content-type: application/json" --request PUT --data '{"classname":"Goods","individualname":"goods2","uid":"zlp","title":"goods2","description":"this is a goods. Test","goods_type":"Food"}' http://192.168.0.108:9000/indiv/update
+curl --header "Content-type: application/json" --request PUT --data '{"classname":"Goods","individualname":"goods3","uid":"zlp","title":"goods3","description":"This is a goods...","goods_type":"Food"}' http://192.168.0.108:9000/indiv/update
