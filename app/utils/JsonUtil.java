@@ -47,6 +47,7 @@ public class JsonUtil {
 		}
 
 		result.putArray(key).addAll(an);
+		System.out.println(result);
 		return result;
 	}
 

@@ -244,6 +244,7 @@ public class MyIndividual extends Controller {
 				}
 			}
 		}
+		System.out.println(on);
 		return ok(on);
 	}
 
@@ -278,6 +279,7 @@ public class MyIndividual extends Controller {
 			}
 			on.put(proname, individual.getPropertyValue(op).toString());
 		}
+		System.out.println(on);
 		return ok(on);
 	}
 
@@ -314,7 +316,7 @@ public class MyIndividual extends Controller {
 			queryString += "}";
 		}
 
-		System.out.println(queryString);
+		// System.out.println(queryString);
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
 		Boolean isClass = json.path("isClass").asBoolean();
@@ -323,7 +325,7 @@ public class MyIndividual extends Controller {
 		while (resultSet.hasNext()) {
 			QuerySolution result = resultSet.nextSolution();
 			String name = result.get("tmp").toString();
-			System.out.println(name);
+			// System.out.println(name);
 
 			// deal with class label
 			if (isClass) {
@@ -338,10 +340,10 @@ public class MyIndividual extends Controller {
 							StatementImpl sti = (StatementImpl) st.next();
 							tmp.put(sti.getPredicate().getLocalName(), sti
 									.getObject().toString());
-							System.out.println(sti.getPredicate()
-									.getLocalName()
-									+ "___"
-									+ sti.getObject().toString());
+							// System.out.println(sti.getPredicate()
+							// .getLocalName()
+							// + "___"
+							// + sti.getObject().toString());
 						}
 						re.put(i.getLocalName(), tmp);
 					}
@@ -385,6 +387,7 @@ public class MyIndividual extends Controller {
 			}
 		}
 		QueryUtil.closeQE();
+		System.out.println(re);
 		return ok(re);
 	}
 

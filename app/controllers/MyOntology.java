@@ -100,6 +100,7 @@ public class MyOntology extends Controller {
 		ObjectNode on = Json.newObject();
 		on.put("relation", relationValue);
 
+		System.out.println(on);
 		return ok(on);
 	}
 
