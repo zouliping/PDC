@@ -38,7 +38,8 @@ public class MyOntModel {
 	 * @return
 	 */
 	private OntModel getModelFromDB(String name) {
-		ModelMaker maker = ModelFactory.createModelRDBMaker(helper.getConnection());
+		ModelMaker maker = ModelFactory.createModelRDBMaker(helper
+				.getConnection());
 		Model model = maker.getModel(name);
 		OntModel newmodel = ModelFactory.createOntologyModel(
 				getModelSpec(maker), model);
@@ -52,7 +53,8 @@ public class MyOntModel {
 	 * @return
 	 */
 	private OntModelSpec getModelSpec(ModelMaker maker) {
-		OntModelSpec spec = new OntModelSpec(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		OntModelSpec spec = new OntModelSpec(
+				OntModelSpec.OWL_MEM_MICRO_RULE_INF);
 		spec.setImportModelMaker(maker);
 		return spec;
 	}
