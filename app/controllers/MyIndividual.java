@@ -87,6 +87,7 @@ public class MyIndividual extends Controller {
 								.toString();
 						if (new_location != null && old_location != null
 								&& !(new_location.equals(old_location))) {
+							System.out.println("send notification");
 							UserUtil.sendNotification(old_location,
 									new_location);
 						}
