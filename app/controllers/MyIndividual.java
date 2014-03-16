@@ -392,31 +392,6 @@ public class MyIndividual extends Controller {
 		return ok(re);
 	}
 
-	/**
-	 * get label
-	 * 
-	 * @param isclass
-	 * @param name
-	 * @return
-	 */
-	public static Result getLabel(String isclass, String name) {
-		OntModel model = MyOntModel.getInstance().getModel();
-		String prefix = model.getNsPrefixURI("");
-
-		if ("true".equals(isclass)) {
-			OntClass oc = model.getOntClass(prefix + name);
-			if (oc == null) {
-				return badRequest(JsonUtil.getFalseJson());
-			} else {
-				return ok();
-			}
-		} else if ("false".equals(isclass)) {
-
-		} else {
-			return badRequest(JsonUtil.getFalseJson());
-		}
-		return ok();
-	}
 
 	/**
 	 * remove the individual

@@ -171,4 +171,53 @@ public class MyOntology extends Controller {
 
 		return ok(JsonUtil.getTrueJson());
 	}
+
+	/**
+	 * get label
+	 * 
+	 * @param isclass
+	 * @param name
+	 * @return
+	 */
+	public static Result getLabel(String isclass, String name) {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+		ArrayList<String> relationList = new ArrayList<String>();
+
+		if ("true".equals(isclass)) {
+			OntClass oc = model.getOntClass(prefix + name);
+
+			if (oc == null) {
+				return badRequest(JsonUtil.getFalseJson());
+			}
+
+			for (ExtendedIterator<?> ei = oc.listLabels(null); ei.hasNext();) {
+				String tmp = ei.next().toString();
+				if (tmp.contains("^^")) {
+					tmp = tmp.substring(0, tmp.indexOf("^^"));
+				}
+				relationList.add(tmp);
+			}
+
+			return ok(JsonUtil.addList2Json("label", relationList));
+		} else if ("false".equals(isclass)) {
+			OntProperty op = model.getOntProperty(prefix + name);
+
+			if (op == null) {
+				return badRequest(JsonUtil.getFalseJson());
+			}
+
+			for (ExtendedIterator<?> ei = op.listLabels(null); ei.hasNext();) {
+				String tmp = (String) ei.next().toString();
+				if (tmp.contains("^^")) {
+					tmp = tmp.substring(0, tmp.indexOf("^^"));
+				}
+				relationList.add(tmp);
+			}
+
+			return ok(JsonUtil.addList2Json("relation", relationList));
+		} else {
+			return badRequest(JsonUtil.getFalseJson());
+		}
+	}
 }
