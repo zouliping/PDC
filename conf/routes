@@ -1,0 +1,31 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET		/							controllers.Application.index()
+PUT		/user/register				controllers.Application.registerUser()
+PUT 	/user/login					controllers.Application.login()
+PUT		/app/register				controllers.Application.registerApp()
+
+# Map static resources from the /public folder to the /assets URL path
+GET		/assets/*file               controllers.Assets.at(path="/public", file)
+
+#MyOntology
+#show all classes name
+GET		/onto/all					controllers.MyOntology.all()
+#get specific properties
+GET		/onto/get                    controllers.MyOntology.getProperties(classname)
+GET		/onto/getrelation				controllers.MyOntology.getRelation(classname1,classname2)
+GET		/onto/getlabel				controllers.MyOntology.getLabel(isclass,name)
+PUT		/onto/add					controllers.MyOntology.add()
+PUT		/onto/addrelation			controllers.MyOntology.addRelation()
+
+#MyIndividual
+GET		/indiv/get					 controllers.MyIndividual.get(classname,uid)
+GET		/indiv/getpro		    	 controllers.MyIndividual.getProperties(indivname,proname ?= null,uid)
+PUT		/indiv/update                 controllers.MyIndividual.update()
+PUT		/indiv/getbylabel			  controllers.MyIndividual.getIndivByLabel()
+PUT		/indiv/remove                 controllers.MyIndividual.remove()
+PUT		/indiv/addrelation			controllers.MyIndividual.addRelation()
+PUT		/indiv/removerelation		controllers.MyIndividual.removeRelation()
