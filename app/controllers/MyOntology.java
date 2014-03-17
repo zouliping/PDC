@@ -12,6 +12,7 @@ import utils.MyOntModel;
 import utils.QueryUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -278,5 +279,58 @@ public class MyOntology extends Controller {
 			}
 		}
 		return ok(JsonUtil.getTrueJson());
+	}
+
+	/**
+	 * get related classes
+	 * 
+	 * @param classname
+	 * @return
+	 */
+	public static Result getRelatedClasses(String classname) {
+		OntModel model = MyOntModel.getInstance().getModel();
+
+		// Get prefixes
+		String defaultPrefix = model.getNsPrefixURI("");
+		String rdfsPrefix = model.getNsPrefixURI("rdfs");
+		String owlPrefix = model.getNsPrefixURI("owl");
+
+		// Create a new query to find classes which have labels
+		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
+				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
+				+ owlPrefix + ">\n" + "SELECT ?class\n"
+				+ "WHERE { ?relation rdfs:domain default:" + classname
+				+ ". \n ?relation rdfs:range ?class .}";
+
+		// System.out.println(queryString);
+		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
+
+		ObjectNode re = Json.newObject();
+
+		while (resultSet.hasNext()) {
+			QuerySolution result = resultSet.nextSolution();
+			String name = result.get("class").toString();
+
+			if (name.contains(defaultPrefix)) {
+				System.out.println(name);
+				OntClass oc = model.getOntClass(name);
+				ArrayList<String> proList = ModelUtil.getPropertyList(oc);
+
+				ArrayNode an = re.arrayNode();
+
+				if (proList == null) {
+					System.out.println("null");
+				}
+				for (String tmp : proList) {
+					an.add(tmp);
+				}
+
+				re.putArray(name.substring(defaultPrefix.length())).addAll(an);
+			}
+		}
+		QueryUtil.closeQE();
+		System.out.println(re);
+		return ok(re);
+
 	}
 }
