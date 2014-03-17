@@ -20,6 +20,7 @@ GET		/onto/getrelation				controllers.MyOntology.getRelation(classname1,classnam
 GET		/onto/getlabel				controllers.MyOntology.getLabel(isclass,name)
 PUT		/onto/add					controllers.MyOntology.add()
 PUT		/onto/addrelation			controllers.MyOntology.addRelation()
+PUT		/onto/addlabel				controllers.MyOntology.addLabel()
 
 #MyIndividual
 GET		/indiv/get					 controllers.MyIndividual.get(classname,uid)

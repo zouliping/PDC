@@ -184,7 +184,7 @@ public class MyOntology extends Controller {
 		String prefix = model.getNsPrefixURI("");
 		ArrayList<String> relationList = new ArrayList<String>();
 
-		if ("true".equals(isclass)) {
+		if ("true".equals(isclass) || "True".equals(isclass)) {
 			OntClass oc = model.getOntClass(prefix + name);
 
 			if (oc == null) {
@@ -200,7 +200,7 @@ public class MyOntology extends Controller {
 			}
 
 			return ok(JsonUtil.addList2Json("label", relationList));
-		} else if ("false".equals(isclass)) {
+		} else if ("false".equals(isclass) || "False".equals(isclass)) {
 			OntProperty op = model.getOntProperty(prefix + name);
 
 			if (op == null) {
@@ -215,9 +215,68 @@ public class MyOntology extends Controller {
 				relationList.add(tmp);
 			}
 
-			return ok(JsonUtil.addList2Json("relation", relationList));
+			return ok(JsonUtil.addList2Json("label", relationList));
 		} else {
 			return badRequest(JsonUtil.getFalseJson());
 		}
+	}
+
+	/**
+	 * add label
+	 * 
+	 * @return
+	 */
+	public static Result addLabel() {
+		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
+		Boolean isClass = json.path("isClass").asBoolean();
+		String name = json.findPath("name").textValue();
+
+		JsonNode array = json.findPath("label");
+		ArrayList<String> labelList = new ArrayList<String>();
+		if (array.isArray()) {
+			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
+				labelList.add(it.next().textValue());
+			}
+		}
+
+		int len = labelList.size();
+		OntModel model = MyOntModel.getInstance().getModel();
+		String prefix = model.getNsPrefixURI("");
+
+		if (isClass) {
+			OntClass oc = model.getOntClass(prefix + name);
+			if (oc == null) {
+				return badRequest(JsonUtil.getFalseJson());
+			}
+
+			if (len == 0) {
+				return badRequest(JsonUtil.getFalseJson());
+			} else if (len == 1) {
+				oc.setLabel(labelList.get(0), null);
+			} else {
+				oc.setLabel(labelList.get(0), null);
+				for (int i = 1; i < len; i++) {
+					oc.addLabel(labelList.get(i), null);
+				}
+			}
+		} else {
+			OntProperty op = model.getOntProperty(prefix + name);
+			if (op == null) {
+				return badRequest(JsonUtil.getFalseJson());
+			}
+
+			if (len == 0) {
+				return badRequest(JsonUtil.getFalseJson());
+			} else if (len == 1) {
+				op.setLabel(labelList.get(0), null);
+			} else {
+				op.setLabel(labelList.get(0), null);
+				for (int i = 1; i < len; i++) {
+					op.addLabel(labelList.get(i), null);
+				}
+			}
+		}
+		return ok(JsonUtil.getTrueJson());
 	}
 }
