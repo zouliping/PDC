@@ -41,7 +41,9 @@ public class MyOntology extends Controller {
 			OntClass oc = (OntClass) i.next();
 
 			if (oc != null) {
-				nameList.add(oc.getLocalName());
+				if (!oc.toString().startsWith("http://www.w3.org/")) {
+					nameList.add(oc.getLocalName());
+				}
 			}
 		}
 
