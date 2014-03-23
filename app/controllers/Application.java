@@ -38,7 +38,7 @@ public class Application extends Controller {
 		if (manager.query("users", "uid", UserUtil.uid, pwd)) {
 			return ok(JsonUtil.getTrueJson());
 		} else {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 	}
 

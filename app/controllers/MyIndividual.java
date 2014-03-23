@@ -54,7 +54,7 @@ public class MyIndividual extends Controller {
 		Long b = System.currentTimeMillis();
 		System.out.println("getontclass time " + (b - a));
 		if (oc == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		Individual i = model.getIndividual(prefix + individualname);
@@ -122,7 +122,7 @@ public class MyIndividual extends Controller {
 		System.out.println(classname1 + "---" + classname2);
 
 		if (classname1 == null || classname2 == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -150,7 +150,7 @@ public class MyIndividual extends Controller {
 		ObjectProperty op = model.getObjectProperty(relation);
 
 		if (op == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
@@ -175,7 +175,7 @@ public class MyIndividual extends Controller {
 		UserUtil.uid = json.findPath("uid").textValue();
 
 		if (indivi1 == null || indivi2 == null || relation == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -186,7 +186,7 @@ public class MyIndividual extends Controller {
 		OntProperty op = model.getOntProperty(prefix + relation);
 
 		if (i1 == null || i2 == null || op == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
@@ -211,7 +211,7 @@ public class MyIndividual extends Controller {
 		ObjectNode on = Json.newObject();
 
 		if (oc == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		// get user's followers
@@ -263,7 +263,7 @@ public class MyIndividual extends Controller {
 		Individual individual = model.getIndividual(prefix + individualname);
 
 		if (individual == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		ObjectNode on = Json.newObject();
@@ -276,7 +276,7 @@ public class MyIndividual extends Controller {
 		} else {
 			OntProperty op = model.getOntProperty(prefix + proname);
 			if (individual.getPropertyValue(op) == null) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			}
 			on.put(proname, individual.getPropertyValue(op).toString());
 		}
@@ -411,7 +411,7 @@ public class MyIndividual extends Controller {
 		Individual i = model.getIndividual(prefix + indivname);
 
 		if (i == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 		if (proname == null) {
 			System.out.println("before remove");
@@ -422,7 +422,7 @@ public class MyIndividual extends Controller {
 			if (op != null) {
 				i.removeProperty(op, i.getPropertyValue(op));
 			} else {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			}
 		}
 		// update the model in db

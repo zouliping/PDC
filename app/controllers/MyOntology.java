@@ -60,7 +60,7 @@ public class MyOntology extends Controller {
 		ArrayList<String> proList = ModelUtil.getPropertyList(classname);
 
 		if (proList == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		} else {
 			return ok(JsonUtil.addList2Json(classname, proList));
 		}
@@ -88,6 +88,8 @@ public class MyOntology extends Controller {
 
 		ResultSet results = QueryUtil.doQuery(model, queryString);
 
+		System.out.println("get relation " + classname1 + " " + classname2);
+
 		// Get property value
 		String relationValue;
 		if (results.hasNext()) {
@@ -96,7 +98,7 @@ public class MyOntology extends Controller {
 					.substring(defaultPrefix.length());
 		} else {
 			relationValue = null;
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		QueryUtil.closeQE();
@@ -119,7 +121,7 @@ public class MyOntology extends Controller {
 		String classname = json.findPath("classname").textValue();
 
 		if (classname == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -154,7 +156,7 @@ public class MyOntology extends Controller {
 		String relation = json.findPath("relation").textValue();
 
 		if (class1 == null || class2 == null || relation == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -165,7 +167,7 @@ public class MyOntology extends Controller {
 		ObjectProperty op = model.createObjectProperty(prefix + relation);
 
 		if (ontClass1 == null || ontClass2 == null) {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 
 		StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
@@ -191,7 +193,7 @@ public class MyOntology extends Controller {
 			OntClass oc = model.getOntClass(prefix + name);
 
 			if (oc == null) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			}
 
 			for (ExtendedIterator<?> ei = oc.listLabels(null); ei.hasNext();) {
@@ -207,7 +209,7 @@ public class MyOntology extends Controller {
 			OntProperty op = model.getOntProperty(prefix + name);
 
 			if (op == null) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			}
 
 			for (ExtendedIterator<?> ei = op.listLabels(null); ei.hasNext();) {
@@ -220,7 +222,7 @@ public class MyOntology extends Controller {
 
 			return ok(JsonUtil.addList2Json("label", relationList));
 		} else {
-			return badRequest(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson());
 		}
 	}
 
@@ -250,11 +252,11 @@ public class MyOntology extends Controller {
 		if (isClass) {
 			OntClass oc = model.getOntClass(prefix + name);
 			if (oc == null) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			}
 
 			if (len == 0) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			} else if (len == 1) {
 				oc.setLabel(labelList.get(0), null);
 			} else {
@@ -266,11 +268,11 @@ public class MyOntology extends Controller {
 		} else {
 			OntProperty op = model.getOntProperty(prefix + name);
 			if (op == null) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			}
 
 			if (len == 0) {
-				return badRequest(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson());
 			} else if (len == 1) {
 				op.setLabel(labelList.get(0), null);
 			} else {
