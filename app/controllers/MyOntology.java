@@ -306,7 +306,6 @@ public class MyOntology extends Controller {
 				+ "WHERE { ?relation rdfs:domain default:" + classname
 				+ ". \n ?relation rdfs:range ?class .}";
 
-		// System.out.println(queryString);
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
 		ObjectNode re = Json.newObject();
@@ -316,14 +315,13 @@ public class MyOntology extends Controller {
 			String name = result.get("class").toString();
 
 			if (name.contains(defaultPrefix)) {
-				System.out.println(name);
 				OntClass oc = model.getOntClass(name);
 				ArrayList<String> proList = ModelUtil.getPropertyList(oc);
 
 				ArrayNode an = re.arrayNode();
 
 				if (proList == null) {
-					System.out.println("null");
+					System.out.println("pro null");
 				}
 				for (String tmp : proList) {
 					an.add(tmp);
