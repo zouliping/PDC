@@ -10,6 +10,7 @@ import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.QueryUtil;
+import utils.StringUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -309,12 +310,14 @@ public class MyOntology extends Controller {
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
 		ObjectNode re = Json.newObject();
+		Boolean haveResult = false;
 
 		while (resultSet.hasNext()) {
 			QuerySolution result = resultSet.nextSolution();
 			String name = result.get("class").toString();
 
 			if (name.contains(defaultPrefix)) {
+				haveResult = true;
 				OntClass oc = model.getOntClass(name);
 				ArrayList<String> proList = ModelUtil.getPropertyList(oc);
 
@@ -332,7 +335,12 @@ public class MyOntology extends Controller {
 		}
 		QueryUtil.closeQE();
 		System.out.println(re);
-		return ok(re);
+		if (haveResult) {
+			return ok(re);
+		} else {
+			return ok(StringUtil.STRING_NULL);
+			// if a class does not have related classes, return null
+		}
 
 	}
 }
