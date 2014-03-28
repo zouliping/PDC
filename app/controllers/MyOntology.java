@@ -170,9 +170,11 @@ public class MyOntology extends Controller {
 		if (ontClass1 == null || ontClass2 == null) {
 			return ok(JsonUtil.getFalseJson());
 		}
+		op.setDomain(ontClass1);
+		op.setRange(ontClass2);
 
-		StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
-		model.add(stmt);
+		// StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
+		// model.add(stmt);
 		MyOntModel.getInstance().updateModel(model);
 
 		return ok(JsonUtil.getTrueJson());
