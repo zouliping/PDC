@@ -45,13 +45,14 @@ public class MyDBManager {
 	 * @param tableName
 	 */
 	public void insertIntoTable(String tableName, String idName, String id,
-			String pwd) {
+			String pwd, String token) {
 		String sql = "INSERT INTO " + tableName + "(" + idName
-				+ ",pwd) values (?,?)";
+				+ ",pwd,token) values (?,?,?)";
 		try {
 			ps = con.prepareStatement(sql);
 			ps.setString(1, id);
 			ps.setString(2, pwd);
+			ps.setString(3, token);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
