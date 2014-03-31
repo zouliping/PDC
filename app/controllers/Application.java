@@ -91,4 +91,9 @@ public class Application extends Controller {
 
 		return ok(JsonUtil.getTrueJson());
 	}
+
+	public static Result setRules() {
+		
+		return ok();
+	}
 }
