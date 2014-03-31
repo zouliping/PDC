@@ -7,16 +7,15 @@ import cn.jpush.api.MessageResult;
 
 public class UserUtil {
 
-	public static String uid = "";
 	public final static String userClassname = "User";
 	public final static String userLabel = "uid";
 	public final static String masterSecret = "eab9c1c35310e34b4973ab89";
 	public final static String appKey = "c8a93696166e0d270c045407";
 
 	public static Boolean sendNotification(String old_location,
-			String new_location) {
+			String new_location, String uid) {
 		JPushClient client = new JPushClient(masterSecret, appKey);
-		System.out.println("no--" + getSendNo() + "---" + UserUtil.uid + "");
+		System.out.println("no--" + getSendNo() + "---" + uid + "");
 		MessageResult result = client.sendNotificationWithAlias(getSendNo(),
 				uid, "PDC", "I moved from " + old_location + " to "
 						+ new_location + ".");

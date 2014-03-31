@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import utils.DatabaseConfig;
-import utils.UserUtil;
 
 public class MyDBManager {
 
@@ -36,19 +35,6 @@ public class MyDBManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * create the db for the user
-	 */
-	public void createDB() {
-		try {
-			// remember to set database character
-			stmt.executeUpdate("create database if not exists " + UserUtil.uid
-					+ " default character set utf8 collate utf8_bin");
-		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -103,6 +89,28 @@ public class MyDBManager {
 		String sql = "SELECT * FROM " + tableName + " WHERE " + idName + "=\'"
 				+ id + "\' and pwd=\'" + pwd + "\'";
 		System.out.println(sql);
+		try {
+			Statement statement = con.createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = statement.executeQuery(sql);
+			if (rs.first()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * confirm user info
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public Boolean confirmUser(String token) {
+		String sql = "SELECT * FROM users WHERE token=\'" + token + "\'";
 		try {
 			Statement statement = con.createStatement(
 					ResultSet.TYPE_SCROLL_INSENSITIVE,

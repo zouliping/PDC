@@ -273,7 +273,7 @@ public class ModelUtil {
 	 * 
 	 * @return
 	 */
-	public static ArrayList<String> getFollowers() {
+	public static ArrayList<String> getFollowers(String uid) {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String defaultPrefix = model.getNsPrefixURI("");
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
@@ -284,7 +284,7 @@ public class ModelUtil {
 		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
 				+ owlPrefix + ">\n" + "SELECT ?user\n" + "WHERE { default:"
-				+ UserUtil.uid + " default:follow ?user }";
+				+ uid + " default:follow ?user }";
 
 		ResultSet results = QueryUtil.doQuery(model, queryString);
 
@@ -303,10 +303,10 @@ public class ModelUtil {
 	 * @param i
 	 * @return
 	 */
-	public static Boolean isUserIndiv(Individual i) {
-		if (i.hasLabel(UserUtil.uid, null)
+	public static Boolean isUserIndiv(Individual i, String uid) {
+		if (i.hasLabel(uid, null)
 				|| i.hasLabel(
-						(UserUtil.uid + "^^<http://www.w3.org/2001/XMLSchema#string>"),
+						(uid + "^^<http://www.w3.org/2001/XMLSchema#string>"),
 						null)) {
 			return true;
 		} else {

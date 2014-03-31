@@ -28,6 +28,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+import db.MyDBManager;
+
 public class MyIndividual extends Controller {
 
 	/**
@@ -44,7 +46,7 @@ public class MyIndividual extends Controller {
 
 		String classname = json.findPath("classname").textValue();
 		String individualname = json.findPath("individualname").textValue();
-		UserUtil.uid = json.findPath("uid").textValue();
+		String token = json.findPath("uid").textValue();
 
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
@@ -61,10 +63,14 @@ public class MyIndividual extends Controller {
 		if (i == null) {
 			System.out.println("create indiv");
 			i = oc.createIndividual(prefix + individualname);
+			// set user label
+			i.addLabel(token, null);
 		}
 
-		// set user label
-		i.addLabel(UserUtil.uid, null);
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(token)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		String old_location;
 		String new_location;
@@ -79,8 +85,7 @@ public class MyIndividual extends Controller {
 				if (("User".equals(classname))
 						&& ("current_location".equals(pro))) {
 					new_location = json.findPath(pro).textValue();
-					Individual individual = model.getIndividual(prefix
-							+ UserUtil.uid);
+					Individual individual = model.getIndividual(prefix + token);
 					OntProperty op = model.getOntProperty(prefix + pro);
 					if (individual.getPropertyValue(op) != null) {
 						old_location = individual.getPropertyValue(op)
@@ -89,7 +94,7 @@ public class MyIndividual extends Controller {
 								&& !(new_location.equals(old_location))) {
 							System.out.println("send notification");
 							UserUtil.sendNotification(old_location,
-									new_location);
+									new_location, token);
 						}
 					}
 
@@ -115,9 +120,14 @@ public class MyIndividual extends Controller {
 
 		String id1 = json.findPath("id1").textValue();
 		String id2 = json.findPath("id2").textValue();
-		UserUtil.uid = json.findPath("uid").textValue();
+		String token = json.findPath("uid").textValue();
 		String classname1 = ModelUtil.getClassname(id1);
 		String classname2 = ModelUtil.getClassname(id2);
+
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(token)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		System.out.println(classname1 + "---" + classname2);
 
@@ -172,7 +182,12 @@ public class MyIndividual extends Controller {
 		String indivi1 = json.findPath("indivi1").textValue();
 		String indivi2 = json.findPath("indivi2").textValue();
 		String relation = json.findPath("relation").textValue();
-		UserUtil.uid = json.findPath("uid").textValue();
+		String token = json.findPath("uid").textValue();
+
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(token)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		if (indivi1 == null || indivi2 == null || relation == null) {
 			return ok(JsonUtil.getFalseJson());
@@ -204,7 +219,6 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result get(String classname, String uid) {
-		UserUtil.uid = uid;
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		OntClass oc = model.getOntClass(prefix + classname);
@@ -214,9 +228,14 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(uid)) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
 		// get user's followers
 		if (UserUtil.userClassname.equals(classname)) {
-			List<String> followers = ModelUtil.getFollowers();
+			List<String> followers = ModelUtil.getFollowers(uid);
 			for (String tmp : followers) {
 				// System.out.println(tmp);
 				Individual iFollower = model.getIndividual(tmp);
@@ -233,7 +252,7 @@ public class MyIndividual extends Controller {
 			for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
 				Individual individual = (Individual) i.next();
 				System.out.println(individual.getLocalName());
-				if (ModelUtil.isUserIndiv(individual)) {
+				if (ModelUtil.isUserIndiv(individual, uid)) {
 					ObjectNode proNode = Json.newObject();
 					for (StmtIterator si = individual.listProperties(); si
 							.hasNext();) {
@@ -257,10 +276,14 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result getProperties(String individualname, String proname,
 			String uid) {
-		UserUtil.uid = uid;
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
+
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(uid)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		if (individual == null) {
 			return ok(JsonUtil.getFalseJson());
@@ -293,7 +316,12 @@ public class MyIndividual extends Controller {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
-		UserUtil.uid = json.findPath("uid").textValue();
+		String uid = json.findPath("uid").textValue();
+
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(uid)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
 
@@ -334,7 +362,7 @@ public class MyIndividual extends Controller {
 				for (ExtendedIterator<?> ei = oc.listInstances(); ei.hasNext();) {
 					Individual i = (Individual) ei.next();
 					System.out.println(i.getLocalName());
-					if (ModelUtil.isUserIndiv(i)) {
+					if (ModelUtil.isUserIndiv(i, uid)) {
 						ObjectNode tmp = Json.newObject();
 
 						for (StmtIterator st = i.listProperties(); st.hasNext();) {
@@ -375,7 +403,7 @@ public class MyIndividual extends Controller {
 					for (ExtendedIterator<?> ei2 = tmpClass.listInstances(); ei2
 							.hasNext();) {
 						Individual individual = (Individual) ei2.next();
-						if (ModelUtil.isUserIndiv(individual)) {
+						if (ModelUtil.isUserIndiv(individual, uid)) {
 							ObjectNode onNode = Json.newObject();
 							if ((individual.getPropertyValue(op)) != null) {
 								onNode.put(name, individual
@@ -392,7 +420,6 @@ public class MyIndividual extends Controller {
 		return ok(re);
 	}
 
-
 	/**
 	 * remove the individual
 	 * 
@@ -404,7 +431,12 @@ public class MyIndividual extends Controller {
 		System.out.println(json.toString());
 		String indivname = json.findPath("indivname").textValue();
 		String proname = json.findPath("proname").textValue();
-		UserUtil.uid = json.findPath("uid").textValue();
+		String token = json.findPath("uid").textValue();
+
+		// confirm user is correct
+		if (!new MyDBManager().confirmUser(token)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
