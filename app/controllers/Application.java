@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import play.mvc.Controller;
@@ -36,7 +37,8 @@ public class Application extends Controller {
 
 		MyDBManager manager = new MyDBManager();
 
-		if (manager.query("users", "uid", uid, pwd)) {
+		if (manager.query("SELECT * FROM users WHERE uid=\'" + uid
+				+ "\' and pwd=\'" + pwd + "\'")) {
 			return ok(SHA1.getSHA1String(uid));
 		} else {
 			return ok(JsonUtil.getFalseJson());
@@ -92,8 +94,57 @@ public class Application extends Controller {
 		return ok(JsonUtil.getTrueJson());
 	}
 
+	/**
+	 * set privacy rules
+	 * 
+	 * @return
+	 */
 	public static Result setRules() {
-		
-		return ok();
+		JsonNode json = request().body().asJson();
+		System.out.println(json.toString());
+
+		String uid = json.findPath("uid").textValue();
+		MyDBManager manager = new MyDBManager();
+
+		// confirm whether user is correct
+		if (!manager.confirmUser(uid)) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		String classname = json.findPath("classname").textValue();
+		Boolean allpro = json.findPath("allpro").asBoolean();
+		Integer level = json.findPath("level").asInt();
+		JsonNode array = json.findPath("pro");
+		ArrayList<String> proList = new ArrayList<String>();
+
+		// if set some properties
+		if (!allpro) {
+			if (array.isArray()) {
+				for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
+					proList.add(it.next().textValue());
+				}
+			}
+		}
+
+		// if the rule is existed, modify the properties
+		if (manager
+				.query("SELECT * FROM rules WHERE uid=\'" + uid
+						+ "\' and classname=\'" + classname + "\' and level = "
+						+ level)) {
+			if (level == 0) {
+				manager.update(allpro,
+						proList.toArray(new String[proList.size()]), level,
+						classname, uid);
+			} else if (level == 1) {
+
+			} else if (level == 2) {
+
+			}
+		} else {
+			manager.insertIntoRules(uid, classname, allpro,
+					proList.toArray(new String[proList.size()]), level);
+		}
+
+		return ok(JsonUtil.getTrueJson());
 	}
 }

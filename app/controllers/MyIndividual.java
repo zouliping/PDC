@@ -67,7 +67,7 @@ public class MyIndividual extends Controller {
 			i.addLabel(token, null);
 		}
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -124,7 +124,7 @@ public class MyIndividual extends Controller {
 		String classname1 = ModelUtil.getClassname(id1);
 		String classname2 = ModelUtil.getClassname(id2);
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -184,7 +184,7 @@ public class MyIndividual extends Controller {
 		String relation = json.findPath("relation").textValue();
 		String token = json.findPath("uid").textValue();
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -228,7 +228,7 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -280,7 +280,7 @@ public class MyIndividual extends Controller {
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -318,7 +318,7 @@ public class MyIndividual extends Controller {
 
 		String uid = json.findPath("uid").textValue();
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -433,7 +433,7 @@ public class MyIndividual extends Controller {
 		String proname = json.findPath("proname").textValue();
 		String token = json.findPath("uid").textValue();
 
-		// confirm user is correct
+		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
 			return ok(JsonUtil.getFalseJson());
 		}

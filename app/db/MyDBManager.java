@@ -1,5 +1,6 @@
 package db;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -79,16 +80,38 @@ public class MyDBManager {
 	}
 
 	/**
-	 * query user or admin table to find uid and pwd
+	 * insert into table rules
 	 * 
-	 * @param tableName
-	 * @param id
-	 * @param pwd
+	 * @param uid
+	 * @param classname
+	 * @param allpro
+	 * @param pro
+	 * @param level
+	 */
+	public void insertIntoRules(String uid, String classname, Boolean allpro,
+			String pro[], Integer level) {
+		String sql = "INSERT INTO rules (uid,classname,allpro,pro,level) values (?,?,?,?,?)";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setString(1, uid);
+			ps.setString(2, classname);
+			ps.setBoolean(3, allpro);
+			Array array = con.createArrayOf("varchar", pro);
+			ps.setArray(4, array);
+			ps.setInt(5, level);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * query
+	 * 
+	 * @param sql
 	 * @return
 	 */
-	public Boolean query(String tableName, String idName, String id, String pwd) {
-		String sql = "SELECT * FROM " + tableName + " WHERE " + idName + "=\'"
-				+ id + "\' and pwd=\'" + pwd + "\'";
+	public Boolean query(String sql) {
 		System.out.println(sql);
 		try {
 			Statement statement = con.createStatement(
@@ -111,7 +134,7 @@ public class MyDBManager {
 	 * @return
 	 */
 	public Boolean confirmUser(String token) {
-		String sql = "SELECT * FROM users WHERE token=\'" + token + "\'";
+		String sql = "SELECT * FROM users WHERE token = \'" + token + "\'";
 		try {
 			Statement statement = con.createStatement(
 					ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -120,6 +143,23 @@ public class MyDBManager {
 			if (rs.first()) {
 				return true;
 			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public Boolean update(Boolean allpro, String pro[], Integer level,
+			String classname, String uid) {
+		String sql = "UPDATE rules SET allpro = ?, level = ?, pro = ? where classname = \'"
+				+ classname + "\' and uid = \'" + uid + "\'";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setBoolean(1, allpro);
+			ps.setInt(2, level);
+			Array array = con.createArrayOf("varchar", pro);
+			ps.setArray(3, array);
+			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
