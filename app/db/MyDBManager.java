@@ -167,24 +167,38 @@ public class MyDBManager {
 	}
 
 	/**
-	 * get all users' id
+	 * get list
 	 * 
+	 * @param sql
 	 * @return
 	 */
-	public ArrayList<String> getAllUsers() {
-		String sql = "SELECT uid FROM user";
-		ArrayList<String> userList = new ArrayList<String>();
+	public ArrayList<String> getList(String sql) {
+		ArrayList<String> list = new ArrayList<String>();
 		try {
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
-				String user = rs.getString(1);
-				userList.add(user);
+				String f = rs.getString(1);
+				list.add(f);
 			}
-			return userList;
+			return list;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public void testQuery(String sql) {
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				Array array = rs.getArray(1);
+				String[] strArray = (String[]) array.getArray();
+				System.out.println(array.toString() + strArray[0]);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**

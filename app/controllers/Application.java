@@ -136,9 +136,21 @@ public class Application extends Controller {
 						proList.toArray(new String[proList.size()]), level,
 						classname, uid);
 			} else if (level == 1) {
-
+				manager.testQuery("SELECT pro FROM rules where uid = \'" + uid
+						+ "\' and classname = \'" + classname + "\'");
 			} else if (level == 2) {
-
+				ArrayList<String> ridList = manager
+						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
+								+ "\' and classname = \'" + classname
+								+ "\' and level = " + level);
+				ArrayList<String> fidList = new ArrayList<String>();
+				for (String rid : ridList) {
+					ArrayList<String> tmp = manager
+							.getList("SELECT fid FROM rules_friends where rid = \'"
+									+ rid + "\'");
+					fidList.addAll(tmp);
+				}
+				System.out.println(fidList.size());
 			}
 		} else {
 			manager.insertIntoRules(uid, classname, allpro,
