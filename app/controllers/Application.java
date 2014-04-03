@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import play.mvc.Controller;
@@ -126,6 +127,25 @@ public class Application extends Controller {
 			}
 		}
 
+		// get sid and fid
+		ArrayList<String> gsidList = new ArrayList<String>();
+		ArrayList<String> gfidList = new ArrayList<String>();
+		if (level != 0) {
+			JsonNode sarray = json.findPath("sid");
+			if (sarray.isArray()) {
+				for (Iterator<JsonNode> it = sarray.elements(); it.hasNext();) {
+					gsidList.add(it.next().textValue());
+				}
+			}
+
+			JsonNode farray = json.findPath("fid");
+			if (farray.isArray()) {
+				for (Iterator<JsonNode> it = farray.elements(); it.hasNext();) {
+					gfidList.add(it.next().textValue());
+				}
+			}
+		}
+
 		// if the rule is existed, modify the properties
 		if (manager
 				.query("SELECT * FROM rules WHERE uid=\'" + uid
@@ -143,14 +163,39 @@ public class Application extends Controller {
 						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
 								+ "\' and classname = \'" + classname
 								+ "\' and level = " + level);
-				ArrayList<String> fidList = new ArrayList<String>();
+				HashMap<String, String> fidMap = new HashMap<String, String>();
 				for (String rid : ridList) {
 					ArrayList<String> tmp = manager
 							.getList("SELECT fid FROM rules_friends where rid = \'"
 									+ rid + "\'");
-					fidList.addAll(tmp);
+					HashMap<String, String> tmpMap = new HashMap<String, String>();
+					for (String tfid : tmp) {
+						tmpMap.put(tfid, rid);
+					}
+					fidMap.putAll(tmpMap);
 				}
-				System.out.println(fidList.size());
+
+				// delete existed rules
+				for (String ef : gfidList) {
+					if (fidMap.containsKey(ef)) {
+						manager.delete("DELETE FROM rules_friends WHERE fid = \'"
+								+ ef
+								+ "\' and rid = \'"
+								+ fidMap.get(ef)
+								+ "\'");
+					}
+				}
+
+				// add new rules into table rules
+				String irid = manager.insertIntoRules(uid, classname, allpro,
+						proList.toArray(new String[proList.size()]), level);
+
+				System.out.println("max id " + irid);
+
+				// add new rules into table rules_friends
+				for (String fid : gfidList) {
+					manager.insertIntoRulesFriends(irid, fid);
+				}
 			}
 		} else {
 			manager.insertIntoRules(uid, classname, allpro,

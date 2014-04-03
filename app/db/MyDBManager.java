@@ -88,7 +88,7 @@ public class MyDBManager {
 	 * @param pro
 	 * @param level
 	 */
-	public void insertIntoRules(String uid, String classname, Boolean allpro,
+	public String insertIntoRules(String uid, String classname, Boolean allpro,
 			String pro[], Integer level) {
 		String sql = "INSERT INTO rules (uid,classname,allpro,pro,level) values (?,?,?,?,?)";
 		try {
@@ -99,6 +99,30 @@ public class MyDBManager {
 			Array array = con.createArrayOf("varchar", pro);
 			ps.setArray(4, array);
 			ps.setInt(5, level);
+			ps.executeUpdate();
+
+			ResultSet rs = stmt.executeQuery("SELECT max(rid) FROM rules");
+			if (rs.next()) {
+				return rs.getString(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * insert into rules_friends
+	 * 
+	 * @param rid
+	 * @param fid
+	 */
+	public void insertIntoRulesFriends(String rid, String fid) {
+		String sql = "INSERT INTO rules_friends (rid,fid) values (?,?)";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setString(1, rid);
+			ps.setString(2, fid);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -125,6 +149,20 @@ public class MyDBManager {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * delete a row
+	 * 
+	 * @param sql
+	 */
+	public void delete(String sql) {
+		try {
+			ps = con.prepareStatement(sql);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
