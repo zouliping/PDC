@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import utils.JsonUtil;
@@ -12,6 +13,7 @@ import utils.SHA1;
 import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -40,7 +42,9 @@ public class Application extends Controller {
 
 		if (manager.query("SELECT * FROM users WHERE uid=\'" + uid
 				+ "\' and pwd=\'" + pwd + "\'")) {
-			return ok(SHA1.getSHA1String(uid));
+			ObjectNode on = Json.newObject();
+			on.put("result", SHA1.getSHA1String(uid));
+			return ok(on);
 		} else {
 			return ok(JsonUtil.getFalseJson());
 		}
