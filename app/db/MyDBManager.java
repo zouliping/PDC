@@ -130,6 +130,24 @@ public class MyDBManager {
 	}
 
 	/**
+	 * insert into rules_services
+	 * 
+	 * @param rid
+	 * @param sid
+	 */
+	public void insertIntoRulesServices(String rid, String sid) {
+		String sql = "INSERT INTO rules_services (rid,sid) values (?,?)";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setString(1, rid);
+			ps.setString(2, sid);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * query
 	 * 
 	 * @param sql

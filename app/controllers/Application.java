@@ -134,14 +134,16 @@ public class Application extends Controller {
 		// get sid and fid
 		ArrayList<String> gsidList = new ArrayList<String>();
 		ArrayList<String> gfidList = new ArrayList<String>();
-		if (level != 0) {
+		if (level == 1) {
 			JsonNode sarray = json.findPath("sid");
 			if (sarray.isArray()) {
 				for (Iterator<JsonNode> it = sarray.elements(); it.hasNext();) {
 					gsidList.add(it.next().textValue());
 				}
 			}
+		}
 
+		if (level == 2) {
 			JsonNode farray = json.findPath("fid");
 			if (farray.isArray()) {
 				for (Iterator<JsonNode> it = farray.elements(); it.hasNext();) {
@@ -160,8 +162,46 @@ public class Application extends Controller {
 						proList.toArray(new String[proList.size()]), level,
 						classname, uid);
 			} else if (level == 1) {
-				manager.testQuery("SELECT pro FROM rules where uid = \'" + uid
-						+ "\' and classname = \'" + classname + "\'");
+				// manager.testQuery("SELECT pro FROM rules where uid = \'" +
+				// uid
+				// + "\' and classname = \'" + classname + "\'");
+
+				ArrayList<String> ridList = manager
+						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
+								+ "\' and classname = \'" + classname
+								+ "\' and level = " + level);
+				HashMap<String, String> sidMap = new HashMap<String, String>();
+				for (String rid : ridList) {
+					ArrayList<String> tmp = manager
+							.getList("SELECT sid FROM rules_services where rid = \'"
+									+ rid + "\'");
+					HashMap<String, String> tmpMap = new HashMap<String, String>();
+					for (String tsid : tmp) {
+						tmpMap.put(tsid, rid);
+					}
+					sidMap.putAll(tmpMap);
+				}
+
+				// delete existed rules
+				for (String es : gsidList) {
+					if (sidMap.containsKey(es)) {
+						manager.delete("DELETE FROM rules_services WHERE sid = \'"
+								+ es
+								+ "\' and rid = \'"
+								+ sidMap.get(es)
+								+ "\'");
+					}
+				}
+
+				// add new rules into table rules
+				String irid = manager.insertIntoRules(uid, classname, allpro,
+						proList.toArray(new String[proList.size()]), level);
+
+				// add new rules into table rules_friends
+				for (String sid : gsidList) {
+					manager.insertIntoRulesServices(irid, sid);
+				}
+
 			} else if (level == 2) {
 				ArrayList<String> ridList = manager
 						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
