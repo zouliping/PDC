@@ -158,13 +158,11 @@ public class Application extends Controller {
 						+ "\' and classname=\'" + classname + "\' and level = "
 						+ level)) {
 			if (level == 0) {
+
 				manager.update(allpro,
 						proList.toArray(new String[proList.size()]), level,
 						classname, uid);
 			} else if (level == 1) {
-				// manager.testQuery("SELECT pro FROM rules where uid = \'" +
-				// uid
-				// + "\' and classname = \'" + classname + "\'");
 
 				ArrayList<String> ridList = manager
 						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
@@ -203,6 +201,7 @@ public class Application extends Controller {
 				}
 
 			} else if (level == 2) {
+
 				ArrayList<String> ridList = manager
 						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
 								+ "\' and classname = \'" + classname

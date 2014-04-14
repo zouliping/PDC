@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import utils.DatabaseConfig;
 
@@ -255,6 +256,48 @@ public class MyDBManager {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * get allpro
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	public Boolean isAllPro(String sql) {
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				Boolean all = rs.getBoolean(1);
+				return all;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * get pro list
+	 * 
+	 * @param sql
+	 * @param classname
+	 * @return
+	 */
+	public ArrayList<String> getProList(String sql) {
+		ArrayList<String> list_pro = new ArrayList<String>();
+
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				Array array = rs.getArray(1);
+				String[] strArray = (String[]) array.getArray();
+				list_pro = new ArrayList<String>(Arrays.asList(strArray));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list_pro;
 	}
 
 	/**
