@@ -11,6 +11,7 @@ import play.mvc.Result;
 import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
+import utils.PrivacyInterpreter;
 import utils.QueryUtil;
 import utils.UserUtil;
 
@@ -218,7 +219,11 @@ public class MyIndividual extends Controller {
 	 * @param classname
 	 * @return
 	 */
-	public static Result get(String classname, String uid) {
+	public static Result get(String classname, String uid, String uname,
+			String sid) {
+		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
+				sid, classname).checkRules();
+
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		OntClass oc = model.getOntClass(prefix + classname);
@@ -242,13 +247,18 @@ public class MyIndividual extends Controller {
 				ObjectNode proNode = Json.newObject();
 				for (StmtIterator si = iFollower.listProperties(); si.hasNext();) {
 					StatementImpl sti = (StatementImpl) si.next();
-					proNode.put(sti.getPredicate().getLocalName(), sti
-							.getObject().toString());
+					if (list_privacy_pro.contains(sti.getPredicate()
+							.getLocalName())) {
+						proNode.put(sti.getPredicate().getLocalName(), sti
+								.getObject().toString());
+					}
 				}
 				on.put(iFollower.getLocalName(), proNode);
 			}
-			// get class's individuals
+
 		} else {
+
+			// get class's individuals
 			for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
 				Individual individual = (Individual) i.next();
 				System.out.println(individual.getLocalName());
@@ -257,8 +267,11 @@ public class MyIndividual extends Controller {
 					for (StmtIterator si = individual.listProperties(); si
 							.hasNext();) {
 						StatementImpl sti = (StatementImpl) si.next();
-						proNode.put(sti.getPredicate().getLocalName(), sti
-								.getObject().toString());
+						if (list_privacy_pro.contains(sti.getPredicate()
+								.getLocalName())) {
+							proNode.put(sti.getPredicate().getLocalName(), sti
+									.getObject().toString());
+						}
 					}
 					on.put(individual.getLocalName(), proNode);
 				}

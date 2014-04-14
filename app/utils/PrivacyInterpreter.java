@@ -60,6 +60,11 @@ public class PrivacyInterpreter {
 			list_public_pro = new ArrayList<String>();
 		}
 
+		System.out.println("public pro");
+		for (String pro : list_public_pro) {
+			System.out.println(pro);
+		}
+
 		if (isMe()) {
 			// is user
 			// to find out whether user sets the service privacy
@@ -70,10 +75,17 @@ public class PrivacyInterpreter {
 			for (String rid : ridList) {
 				if (manager.query("SELECT * FROM rules_services where rid = \'"
 						+ rid + "\' and sid = \'" + sid + "\'")) {
-					list_public_pro.addAll(manager
+					ArrayList<String> list_tmp = manager
 							.getProList("SELECT pro FROM rules where rid = \'"
-									+ rid + "\'"));
+									+ rid + "\'");
+					list_public_pro.removeAll(list_tmp);
+					list_public_pro.addAll(list_tmp);
 				}
+			}
+
+			System.out.println("is user pro");
+			for (String pro : list_public_pro) {
+				System.out.println(pro);
 			}
 
 		} else {
@@ -86,10 +98,17 @@ public class PrivacyInterpreter {
 			for (String rid : ridList) {
 				if (manager.query("SELECT * FROM rules_friends where rid = \'"
 						+ rid + "\' and fid = \'" + uname + "\'")) {
-					list_public_pro.addAll(manager
+					ArrayList<String> list_tmp = manager
 							.getProList("SELECT pro FROM rules where rid = \'"
-									+ rid + "\'"));
+									+ rid + "\'");
+					list_public_pro.removeAll(list_tmp);
+					list_public_pro.addAll(list_tmp);
 				}
+			}
+
+			System.out.println("is not user pro");
+			for (String pro : list_public_pro) {
+				System.out.println(pro);
 			}
 
 		}
