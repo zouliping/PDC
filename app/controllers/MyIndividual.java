@@ -287,8 +287,11 @@ public class MyIndividual extends Controller {
 	 * @param individualname
 	 * @return
 	 */
-	public static Result getProperties(String individualname, String proname,
-			String uid) {
+	public static Result getProperties(String classname, String individualname,
+			String proname, String uid, String uname, String sid) {
+		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
+				sid, classname).checkRules();
+
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
@@ -306,15 +309,20 @@ public class MyIndividual extends Controller {
 		if (proname == null) {
 			for (StmtIterator si = individual.listProperties(); si.hasNext();) {
 				StatementImpl sti = (StatementImpl) si.next();
-				on.put(sti.getPredicate().getLocalName(), sti.getObject()
-						.toString());
+				if (list_privacy_pro
+						.contains(sti.getPredicate().getLocalName())) {
+					on.put(sti.getPredicate().getLocalName(), sti.getObject()
+							.toString());
+				}
 			}
 		} else {
 			OntProperty op = model.getOntProperty(prefix + proname);
 			if (individual.getPropertyValue(op) == null) {
 				return ok(JsonUtil.getFalseJson());
 			}
-			on.put(proname, individual.getPropertyValue(op).toString());
+			if (list_privacy_pro.contains(proname)) {
+				on.put(proname, individual.getPropertyValue(op).toString());
+			}
 		}
 		System.out.println(on);
 		return ok(on);
