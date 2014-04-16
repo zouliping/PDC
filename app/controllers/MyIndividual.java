@@ -13,6 +13,7 @@ import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.PrivacyInterpreter;
 import utils.QueryUtil;
+import utils.SHA1;
 import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -238,9 +239,11 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
+		String get_user = SHA1.getSHA1String(uname);
+
 		// get user's followers
 		if (UserUtil.userClassname.equals(classname)) {
-			List<String> followers = ModelUtil.getFollowers(uid);
+			List<String> followers = ModelUtil.getFollowers(get_user);
 			for (String tmp : followers) {
 				// System.out.println(tmp);
 				Individual iFollower = model.getIndividual(tmp);
@@ -262,7 +265,7 @@ public class MyIndividual extends Controller {
 			for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
 				Individual individual = (Individual) i.next();
 				System.out.println(individual.getLocalName());
-				if (ModelUtil.isUserIndiv(individual, uid)) {
+				if (ModelUtil.isUserIndiv(individual, get_user)) {
 					ObjectNode proNode = Json.newObject();
 					for (StmtIterator si = individual.listProperties(); si
 							.hasNext();) {

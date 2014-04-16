@@ -39,10 +39,11 @@ public class PrivacyInterpreter {
 
 	public ArrayList<String> checkRules() {
 		ArrayList<String> list_public_pro;
+		String get_user = SHA1.getSHA1String(uname);
 		// first, get public pro
 		MyDBManager manager = new MyDBManager();
 		Boolean allpro = manager
-				.isAllPro("SELECT allpro FROM rules where uid = \'" + uid
+				.isAllPro("SELECT allpro FROM rules where uid = \'" + get_user
 						+ "\' and classname = \'" + classname
 						+ "\' and level = 0");
 
@@ -53,8 +54,8 @@ public class PrivacyInterpreter {
 			} else {
 				list_public_pro = manager
 						.getProList("SELECT pro FROM rules where uid = \'"
-								+ uid + "\' and classname = \'" + classname
-								+ "\' and level = 0");
+								+ get_user + "\' and classname = \'"
+								+ classname + "\' and level = 0");
 			}
 		} else {
 			list_public_pro = new ArrayList<String>();
@@ -92,12 +93,12 @@ public class PrivacyInterpreter {
 			// is not user
 			// to find out whether user set the friend privacy
 			ArrayList<String> ridList = manager
-					.getList("SELECT rid FROM rules WHERE uid = \'" + uid
+					.getList("SELECT rid FROM rules WHERE uid = \'" + get_user
 							+ "\' and classname = \'" + classname
 							+ "\' and level = 2");
 			for (String rid : ridList) {
 				if (manager.query("SELECT * FROM rules_friends where rid = \'"
-						+ rid + "\' and fid = \'" + uname + "\'")) {
+						+ rid + "\' and fid = \'" + uid + "\'")) {
 					ArrayList<String> list_tmp = manager
 							.getProList("SELECT pro FROM rules where rid = \'"
 									+ rid + "\'");
