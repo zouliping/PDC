@@ -26,6 +26,7 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -359,14 +360,26 @@ public class MyIndividual extends Controller {
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
 				+ owlPrefix + ">\n" + "SELECT ?tmp\n" + "WHERE { ";
 
+		String str_label = "";
+
 		JsonNode array = json.findPath("label");
 		if (array.isArray()) {
 			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
 				JsonNode label = it.next();
+				str_label = str_label + label.textValue() + "#";
 				queryString += "?tmp rdfs:label \"" + label.textValue()
 						+ "\"^^<http://www.w3.org/2001/XMLSchema#string>.";
 			}
 			queryString += "}";
+		}
+
+		JsonNode array2 = json.findPath("filter");
+		ArrayList<String> list_filter = new ArrayList<String>();
+		if (array2.isArray()) {
+			for (Iterator<JsonNode> it = array2.elements(); it.hasNext();) {
+				JsonNode label = it.next();
+				list_filter.add(label.textValue());
+			}
 		}
 
 		// System.out.println(queryString);
@@ -401,11 +414,14 @@ public class MyIndividual extends Controller {
 						re.put(i.getLocalName(), tmp);
 					}
 				}
-				// deal with property label
+
 			} else {
+
+				// deal with property label
 				ArrayList<OntClass> classList = new ArrayList<OntClass>();
 				OntProperty op = model.getOntProperty(name);
 				ExtendedIterator<?> ei = op.listDomain();
+				String selected_pro = str_label + op.getLocalName();
 
 				// to get all classes which have the same property
 				if (ei.hasNext()) {
@@ -424,16 +440,38 @@ public class MyIndividual extends Controller {
 				}
 
 				for (OntClass tmpClass : classList) {
-					for (ExtendedIterator<?> ei2 = tmpClass.listInstances(); ei2
-							.hasNext();) {
-						Individual individual = (Individual) ei2.next();
-						if (ModelUtil.isUserIndiv(individual, uid)) {
-							ObjectNode onNode = Json.newObject();
-							if ((individual.getPropertyValue(op)) != null) {
-								onNode.put(name, individual
-										.getPropertyValue(op).toString());
+
+					if (!list_filter.contains(tmpClass.getLabel(null))) {
+
+						System.out.println("after filter------"
+								+ tmpClass.getLocalName() + "------"
+								+ tmpClass.getLabel(null));
+						for (ExtendedIterator<?> ei2 = tmpClass.listInstances(); ei2
+								.hasNext();) {
+							Individual individual = (Individual) ei2.next();
+							if (ModelUtil.isUserIndiv(individual, uid)) {
+								ObjectNode onNode = Json.newObject();
+								// add property with label, set pro name like
+								// "time#created_time"
+								if ((individual.getPropertyValue(op)) != null) {
+									onNode.put(selected_pro, individual
+											.getPropertyValue(op).toString());
+								}
+
+								// add other properties
+								for (StmtIterator si = individual
+										.listProperties(); si.hasNext();) {
+									Statement stmt = si.next();
+									if (!name.equals(stmt.getPredicate()
+											.toString())) {
+										onNode.put(stmt.getPredicate()
+												.getLocalName(), stmt
+												.getObject().toString());
+									}
+								}
+
+								re.put(individual.getLocalName(), onNode);
 							}
-							re.put(individual.getLocalName(), onNode);
 						}
 					}
 				}
