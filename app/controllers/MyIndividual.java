@@ -360,13 +360,10 @@ public class MyIndividual extends Controller {
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
 				+ owlPrefix + ">\n" + "SELECT ?tmp\n" + "WHERE { ";
 
-		String str_label = "";
-
 		JsonNode array = json.findPath("label");
 		if (array.isArray()) {
 			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
 				JsonNode label = it.next();
-				str_label = str_label + label.textValue() + "#";
 				queryString += "?tmp rdfs:label \"" + label.textValue()
 						+ "\"^^<http://www.w3.org/2001/XMLSchema#string>.";
 			}
@@ -404,12 +401,13 @@ public class MyIndividual extends Controller {
 
 						for (StmtIterator st = i.listProperties(); st.hasNext();) {
 							StatementImpl sti = (StatementImpl) st.next();
-							tmp.put(sti.getPredicate().getLocalName(), sti
+
+							OntProperty tmp_pro = model.getOntProperty(sti
+									.getPredicate().toString());
+
+							tmp.put(tmp_pro.getLabel(null) + "#"
+									+ sti.getPredicate().getLocalName(), sti
 									.getObject().toString());
-							// System.out.println(sti.getPredicate()
-							// .getLocalName()
-							// + "___"
-							// + sti.getObject().toString());
 						}
 						re.put(i.getLocalName(), tmp);
 					}
@@ -421,7 +419,6 @@ public class MyIndividual extends Controller {
 				ArrayList<OntClass> classList = new ArrayList<OntClass>();
 				OntProperty op = model.getOntProperty(name);
 				ExtendedIterator<?> ei = op.listDomain();
-				String selected_pro = str_label + op.getLocalName();
 
 				// to get all classes which have the same property
 				if (ei.hasNext()) {
@@ -452,22 +449,20 @@ public class MyIndividual extends Controller {
 							if (ModelUtil.isUserIndiv(individual, uid)) {
 								ObjectNode onNode = Json.newObject();
 								// add property with label, set pro name like
-								// "time#created_time"
-								if ((individual.getPropertyValue(op)) != null) {
-									onNode.put(selected_pro, individual
-											.getPropertyValue(op).toString());
-								}
+								// "time#created_time", "null#type"
 
 								// add other properties
 								for (StmtIterator si = individual
 										.listProperties(); si.hasNext();) {
 									Statement stmt = si.next();
-									if (!name.equals(stmt.getPredicate()
-											.toString())) {
-										onNode.put(stmt.getPredicate()
-												.getLocalName(), stmt
-												.getObject().toString());
-									}
+									OntProperty tmp_pro = model
+											.getOntProperty(stmt.getPredicate()
+													.toString());
+									onNode.put(tmp_pro.getLabel(null)
+											+ "#"
+											+ stmt.getPredicate()
+													.getLocalName(), stmt
+											.getObject().toString());
 								}
 
 								re.put(individual.getLocalName(), onNode);
