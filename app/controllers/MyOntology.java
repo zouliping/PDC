@@ -23,6 +23,8 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+import db.MyDBManager;
+
 public class MyOntology extends Controller {
 
 	private static OntModel model;
@@ -119,8 +121,14 @@ public class MyOntology extends Controller {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String classname = json.findPath("classname").textValue();
+		String token = json.findPath("did").textValue();
 
 		if (classname == null) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		// confirm whether dev is correct
+		if (!new MyDBManager().confirmDev(token)) {
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -154,8 +162,14 @@ public class MyOntology extends Controller {
 		String class1 = json.findPath("class1").textValue();
 		String class2 = json.findPath("class2").textValue();
 		String relation = json.findPath("relation").textValue();
+		String token = json.findPath("did").textValue();
 
 		if (class1 == null || class2 == null || relation == null) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		// confirm whether dev is correct
+		if (!new MyDBManager().confirmDev(token)) {
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -238,6 +252,12 @@ public class MyOntology extends Controller {
 		System.out.println(json.toString());
 		Boolean isClass = json.path("isClass").asBoolean();
 		String name = json.findPath("name").textValue();
+		String token = json.findPath("did").textValue();
+
+		// confirm whether dev is correct
+		if (!new MyDBManager().confirmDev(token)) {
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		JsonNode array = json.findPath("label");
 		ArrayList<String> labelList = new ArrayList<String>();

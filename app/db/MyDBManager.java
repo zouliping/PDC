@@ -62,6 +62,26 @@ public class MyDBManager {
 	}
 
 	/**
+	 * insert into dev table
+	 * 
+	 * @param dname
+	 * @param dpwd
+	 * @param dtoken
+	 */
+	public void insertIntoDevTable(String dname, String dpwd, String dtoken) {
+		String sql = "INSERT INTO dev (dname, dpwd, dtoken) values (?,?,?)";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setString(1, dname);
+			ps.setString(2, dpwd);
+			ps.setString(3, dtoken);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * insert a data into service table
 	 * 
 	 * @param name
@@ -192,6 +212,28 @@ public class MyDBManager {
 	 */
 	public Boolean confirmUser(String token) {
 		String sql = "SELECT * FROM users WHERE token = \'" + token + "\'";
+		try {
+			Statement statement = con.createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = statement.executeQuery(sql);
+			if (rs.first()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * confirm dev
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public Boolean confirmDev(String token) {
+		String sql = "SELECT * FROM dev WHERE dtoken = \'" + token + "\'";
 		try {
 			Statement statement = con.createStatement(
 					ResultSet.TYPE_SCROLL_INSENSITIVE,

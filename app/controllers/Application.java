@@ -37,11 +37,20 @@ public class Application extends Controller {
 		System.out.println(json.toString());
 		String uid = json.findPath("id").textValue();
 		String pwd = json.findPath("password").textValue();
+		Boolean isDev = json.findPath("isDev").asBoolean();
 
 		MyDBManager manager = new MyDBManager();
 
-		if (manager.query("SELECT * FROM users WHERE uid=\'" + uid
-				+ "\' and pwd=\'" + pwd + "\'")) {
+		String sql = null;
+		if (isDev) {
+			sql = "SELECT * FROM dev WHERE dname=\'" + uid + "\' and dpwd=\'"
+					+ pwd + "\'";
+		} else {
+			sql = "SELECT * FROM users WHERE uid=\'" + uid + "\' and pwd=\'"
+					+ pwd + "\'";
+		}
+
+		if (manager.query(sql)) {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
 			return ok(on);
@@ -60,25 +69,32 @@ public class Application extends Controller {
 		System.out.println(json.toString());
 		String uid = json.findPath("id").textValue();
 		String pwd = json.findPath("password").textValue();
+		Boolean isDev = json.findPath("isDev").asBoolean();
 
 		MyDBManager manager = new MyDBManager();
-		manager.insertIntoTable("users", "uid", uid, pwd,
-				SHA1.getSHA1String(uid));
-		// create a new db for a user
-		// manager.createDB();
 
-		MyDBHelper helper = new MyDBHelper();
+		if (isDev) {
+			manager.insertIntoDevTable(uid, pwd, SHA1.getSHA1String(uid));
 
-		// store ontology in a new db
-		OntModel model = ModelUtil.createModel(helper.getConnection());
+		} else {
+			manager.insertIntoTable("users", "uid", uid, pwd,
+					SHA1.getSHA1String(uid));
+			// create a new db for a user
+			// manager.createDB();
 
-		// create a user, store in ontology
-		String prefix = model.getNsPrefixURI("");
-		OntClass oUser = model.getOntClass(prefix + UserUtil.userClassname);
-		Individual iUser = oUser.createIndividual(prefix + uid);
-		iUser.addLabel(SHA1.getSHA1String(uid), null);
-		Iterator<String> it = json.fieldNames();
-		ModelUtil.addIndividualProperties(oUser, iUser, it, json);
+			MyDBHelper helper = new MyDBHelper();
+
+			// store ontology in a new db
+			OntModel model = ModelUtil.createModel(helper.getConnection());
+
+			// create a user, store in ontology
+			String prefix = model.getNsPrefixURI("");
+			OntClass oUser = model.getOntClass(prefix + UserUtil.userClassname);
+			Individual iUser = oUser.createIndividual(prefix + uid);
+			iUser.addLabel(SHA1.getSHA1String(uid), null);
+			Iterator<String> it = json.fieldNames();
+			ModelUtil.addIndividualProperties(oUser, iUser, it, json);
+		}
 		return ok(JsonUtil.getTrueJson());
 	}
 
