@@ -1,5 +1,9 @@
 package controllers;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,6 +13,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import utils.JsonUtil;
 import utils.ModelUtil;
+import utils.MyOntModel;
 import utils.SHA1;
 import utils.UserUtil;
 
@@ -262,5 +267,29 @@ public class Application extends Controller {
 		}
 
 		return ok(JsonUtil.getTrueJson());
+	}
+
+	/**
+	 * get owl file
+	 * 
+	 * @return
+	 */
+	public static Result getOwlFile() {
+		OntModel model = MyOntModel.getInstance().getModel();
+		String fileName = "owl/pdc_ontology_" + System.currentTimeMillis()
+				+ ".owl";
+		File file = new File(fileName);
+
+		try {
+			FileOutputStream fos = new FileOutputStream(file);
+			model.write(fos);
+			fos.close();
+			return ok(file, false);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ok(JsonUtil.getFalseJson());
 	}
 }
