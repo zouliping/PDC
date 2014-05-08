@@ -277,14 +277,14 @@ public class Application extends Controller {
 	public static Result getOwlFile() {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String fileName = "owl/pdc_ontology_" + System.currentTimeMillis()
-				+ ".owl";
+				+ ".rdf";
 		File file = new File(fileName);
 
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			model.write(fos);
 			fos.close();
-			return ok(file, false);
+			return ok(file);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
