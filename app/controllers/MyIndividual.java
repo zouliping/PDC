@@ -225,6 +225,8 @@ public class MyIndividual extends Controller {
 			String sid) {
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
+		System.out
+				.println(classname + " public pro " + list_privacy_pro.size());
 
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
@@ -504,8 +506,10 @@ public class MyIndividual extends Controller {
 		}
 		if (proname == null) {
 			System.out.println("before remove");
+			Long a = System.currentTimeMillis();
 			i.remove();
-			System.out.println("after remove");
+			Long b = System.currentTimeMillis();
+			System.out.println("after remove and use " + (b - a));
 		} else {
 			OntProperty op = model.getOntProperty(prefix + proname);
 			if (op != null) {
