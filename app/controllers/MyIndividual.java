@@ -17,6 +17,7 @@ import utils.SHA1;
 import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.ObjectProperty;
@@ -26,6 +27,7 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
@@ -227,6 +229,9 @@ public class MyIndividual extends Controller {
 				sid, classname).checkRules();
 		System.out
 				.println(classname + " public pro " + list_privacy_pro.size());
+		// for (String tmp : list_privacy_pro) {
+		// System.out.println(tmp);
+		// }
 
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
@@ -317,8 +322,22 @@ public class MyIndividual extends Controller {
 				StatementImpl sti = (StatementImpl) si.next();
 				if (list_privacy_pro
 						.contains(sti.getPredicate().getLocalName())) {
-					on.put(sti.getPredicate().getLocalName(), sti.getObject()
-							.toString());
+					// if the property is object property, add a "+";else add a
+					// "-"
+					ArrayNode an = on.arrayNode();
+					if (sti.getObject().toString().startsWith(prefix)) {
+						ObjectProperty op = model.getObjectProperty(sti
+								.getPredicate().toString());
+						for (NodeIterator ni = individual
+								.listPropertyValues(op); ni.hasNext();) {
+							an.add(ni.next().toString());
+						}
+						on.putArray("+" + sti.getPredicate().getLocalName())
+								.addAll(an);
+					} else {
+						on.put("-" + sti.getPredicate().getLocalName(), sti
+								.getObject().toString());
+					}
 				}
 			}
 		} else {
@@ -327,7 +346,20 @@ public class MyIndividual extends Controller {
 				return ok(JsonUtil.getFalseJson());
 			}
 			if (list_privacy_pro.contains(proname)) {
-				on.put(proname, individual.getPropertyValue(op).toString());
+				if (individual.getPropertyValue(op).toString()
+						.startsWith(prefix)) {
+					ObjectProperty obp = model.getObjectProperty(prefix
+							+ proname);
+					ArrayNode an = on.arrayNode();
+					for (NodeIterator ni = individual.listPropertyValues(obp); ni
+							.hasNext();) {
+						an.add(ni.next().toString());
+					}
+					on.putArray("+" + proname).addAll(an);
+				} else {
+					on.put("-" + proname, individual.getPropertyValue(op)
+							.toString());
+				}
 			}
 		}
 		System.out.println(on);
