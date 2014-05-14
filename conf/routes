@@ -27,7 +27,7 @@ PUT		/onto/add_label				controllers.MyOntology.addLabel()
 
 #MyIndividual
 GET		/indiv/get					 controllers.MyIndividual.get(classname,uid,uname,sid)
-GET		/indiv/get_pro		    	 controllers.MyIndividual.getProperties(classname,indivname,proname ?= null,uid,uname,sid)
+GET		/indiv/get_pro		    	 controllers.MyIndividual.getProperties(indivname,proname ?= null,uid,uname,sid)
 PUT		/indiv/update                controllers.MyIndividual.update()
 PUT		/indiv/get_by_label			 controllers.MyIndividual.getIndivByLabel()
 PUT		/indiv/remove                controllers.MyIndividual.remove()

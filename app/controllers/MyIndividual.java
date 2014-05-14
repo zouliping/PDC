@@ -260,8 +260,25 @@ public class MyIndividual extends Controller {
 					StatementImpl sti = (StatementImpl) si.next();
 					if (list_privacy_pro.contains(sti.getPredicate()
 							.getLocalName())) {
-						proNode.put(sti.getPredicate().getLocalName(), sti
-								.getObject().toString());
+						// if the property is object property, add a
+						// "+";else add a
+						// "-"
+						ArrayNode an = on.arrayNode();
+						if (sti.getObject().toString().startsWith(prefix)) {
+							ObjectProperty op = model.getObjectProperty(sti
+									.getPredicate().toString());
+							for (NodeIterator ni = iFollower
+									.listPropertyValues(op); ni.hasNext();) {
+								an.add(ni.next().toString());
+							}
+							proNode.putArray(
+									"+" + sti.getPredicate().getLocalName())
+									.addAll(an);
+						} else {
+							proNode.put(
+									"-" + sti.getPredicate().getLocalName(),
+									sti.getObject().toString());
+						}
 					}
 				}
 				on.put(iFollower.getLocalName(), proNode);
@@ -280,8 +297,26 @@ public class MyIndividual extends Controller {
 						StatementImpl sti = (StatementImpl) si.next();
 						if (list_privacy_pro.contains(sti.getPredicate()
 								.getLocalName())) {
-							proNode.put(sti.getPredicate().getLocalName(), sti
-									.getObject().toString());
+
+							// if the property is object property, add a
+							// "+";else add a
+							// "-"
+							ArrayNode an = on.arrayNode();
+							if (sti.getObject().toString().startsWith(prefix)) {
+								ObjectProperty op = model.getObjectProperty(sti
+										.getPredicate().toString());
+								for (NodeIterator ni = individual
+										.listPropertyValues(op); ni.hasNext();) {
+									an.add(ni.next().toString());
+								}
+								proNode.putArray(
+										"+" + sti.getPredicate().getLocalName())
+										.addAll(an);
+							} else {
+								proNode.put("-"
+										+ sti.getPredicate().getLocalName(),
+										sti.getObject().toString());
+							}
 						}
 					}
 					on.put(individual.getLocalName(), proNode);
@@ -298,11 +333,8 @@ public class MyIndividual extends Controller {
 	 * @param individualname
 	 * @return
 	 */
-	public static Result getProperties(String classname, String individualname,
-			String proname, String uid, String uname, String sid) {
-		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
-				sid, classname).checkRules();
-
+	public static Result getProperties(String individualname, String proname,
+			String uid, String uname, String sid) {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
@@ -315,6 +347,9 @@ public class MyIndividual extends Controller {
 		if (individual == null) {
 			return ok(JsonUtil.getFalseJson());
 		}
+
+		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
+				sid, individual.getOntClass().getLocalName()).checkRules();
 
 		ObjectNode on = Json.newObject();
 		if (proname == null) {
