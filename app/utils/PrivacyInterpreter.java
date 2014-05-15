@@ -61,10 +61,10 @@ public class PrivacyInterpreter {
 			list_public_pro = new ArrayList<String>();
 		}
 
-		System.out.println("public pro");
-		for (String pro : list_public_pro) {
-			System.out.println(pro);
-		}
+		// System.out.println("public pro");
+		// for (String pro : list_public_pro) {
+		// System.out.println(pro);
+		// }
 
 		if (isMe()) {
 			// is user
@@ -84,10 +84,10 @@ public class PrivacyInterpreter {
 				}
 			}
 
-			System.out.println("is user pro");
-			for (String pro : list_public_pro) {
-				System.out.println(pro);
-			}
+			// System.out.println("is user pro");
+			// for (String pro : list_public_pro) {
+			// System.out.println(pro);
+			// }
 
 		} else {
 			// is not user

@@ -53,8 +53,7 @@ public class MyOntModel {
 	 * @return
 	 */
 	private OntModelSpec getModelSpec(ModelMaker maker) {
-		OntModelSpec spec = new OntModelSpec(
-				OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		OntModelSpec spec = new OntModelSpec(OntModelSpec.OWL_MEM);
 		spec.setImportModelMaker(maker);
 		return spec;
 	}

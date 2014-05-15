@@ -88,7 +88,7 @@ public class MyIndividual extends Controller {
 					|| "uid".equals(pro)) {
 			} else {
 				if (("User".equals(classname))
-						&& ("current_location".equals(pro))) {
+						&& ("u_current_location".equals(pro))) {
 					new_location = json.findPath(pro).textValue();
 					Individual individual = model.getIndividual(prefix + token);
 					OntProperty op = model.getOntProperty(prefix + pro);
@@ -225,6 +225,7 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result get(String classname, String uid, String uname,
 			String sid) {
+		System.out.println("uname " + uname);
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
 		System.out
@@ -289,7 +290,6 @@ public class MyIndividual extends Controller {
 			// get class's individuals
 			for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
 				Individual individual = (Individual) i.next();
-				System.out.println(individual.getLocalName());
 				if (ModelUtil.isUserIndiv(individual, get_user)) {
 					ObjectNode proNode = Json.newObject();
 					for (StmtIterator si = individual.listProperties(); si
@@ -297,7 +297,6 @@ public class MyIndividual extends Controller {
 						StatementImpl sti = (StatementImpl) si.next();
 						if (list_privacy_pro.contains(sti.getPredicate()
 								.getLocalName())) {
-
 							// if the property is object property, add a
 							// "+";else add a
 							// "-"
