@@ -39,6 +39,12 @@ public class PrivacyInterpreter {
 
 	public ArrayList<String> checkRules() {
 		ArrayList<String> list_public_pro;
+
+		// if user uses portal, he can check all his dataf
+		if (isMe() && UserUtil.sid.equals(sid)) {
+			return ModelUtil.getPropertyList(classname);
+		}
+
 		String get_user = SHA1.getSHA1String(uname);
 		// first, get public pro
 		MyDBManager manager = new MyDBManager();

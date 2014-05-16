@@ -225,7 +225,6 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result get(String classname, String uid, String uname,
 			String sid) {
-		System.out.println("uname " + uname);
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
 		System.out
@@ -472,10 +471,11 @@ public class MyIndividual extends Controller {
 
 							OntProperty tmp_pro = model.getOntProperty(sti
 									.getPredicate().toString());
-
-							tmp.put(tmp_pro.getLabel(null) + "#"
-									+ sti.getPredicate().getLocalName(), sti
-									.getObject().toString());
+							if (tmp_pro != null) {
+								tmp.put(tmp_pro.getLabel(null) + "#"
+										+ sti.getPredicate().getLocalName(),
+										sti.getObject().toString());
+							}
 						}
 						re.put(i.getLocalName(), tmp);
 					}
@@ -526,11 +526,13 @@ public class MyIndividual extends Controller {
 									OntProperty tmp_pro = model
 											.getOntProperty(stmt.getPredicate()
 													.toString());
-									onNode.put(tmp_pro.getLabel(null)
-											+ "#"
-											+ stmt.getPredicate()
-													.getLocalName(), stmt
-											.getObject().toString());
+									if (tmp_pro != null) {
+										onNode.put(tmp_pro.getLabel(null)
+												+ "#"
+												+ stmt.getPredicate()
+														.getLocalName(), stmt
+												.getObject().toString());
+									}
 								}
 
 								re.put(individual.getLocalName(), onNode);

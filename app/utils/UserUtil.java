@@ -11,6 +11,7 @@ public class UserUtil {
 	public final static String userLabel = "uid";
 	public final static String masterSecret = "eab9c1c35310e34b4973ab89";
 	public final static String appKey = "c8a93696166e0d270c045407";
+	public final static String sid = "portal";
 
 	public static Boolean sendNotification(String old_location,
 			String new_location, String uid) {
