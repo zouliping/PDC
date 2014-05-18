@@ -23,7 +23,6 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 
-import db.MyDBHelper;
 import db.MyDBManager;
 
 public class Application extends Controller {
@@ -33,11 +32,12 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * user login
+	 * user or developer login
 	 * 
 	 * @return
 	 */
 	public static Result login() {
+		// StringUtil.printStr(, StringUtil.START_TIME);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String uid = json.findPath("id").textValue();
@@ -46,6 +46,7 @@ public class Application extends Controller {
 
 		MyDBManager manager = new MyDBManager();
 
+		// how to operate database correctly in controllers?
 		String sql = null;
 		if (isDev) {
 			sql = "SELECT * FROM dev WHERE dname=\'" + uid + "\' and dpwd=\'"
@@ -65,16 +66,18 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * register a user, and create a db for him
+	 * register a user, and insert a row in table users
 	 * 
 	 * @return
 	 */
 	public static Result registerUser() {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
-		String uid = json.findPath("id").textValue();
-		String pwd = json.findPath("password").textValue();
-		Boolean isDev = json.findPath("isDev").asBoolean();
+		String uid = json.findPath("u_id").textValue();
+		String pwd = json.findPath("u_password").textValue();
+		// Boolean isDev = json.findPath("isDev").asBoolean();
+		Boolean isDev = false; // do not use developer registration, it is
+								// unsafe.
 
 		MyDBManager manager = new MyDBManager();
 
@@ -84,13 +87,8 @@ public class Application extends Controller {
 		} else {
 			manager.insertIntoTable("users", "uid", uid, pwd,
 					SHA1.getSHA1String(uid));
-			// create a new db for a user
-			// manager.createDB();
 
-			MyDBHelper helper = new MyDBHelper();
-
-			// store ontology in a new db
-			OntModel model = ModelUtil.createModel(helper.getConnection());
+			OntModel model = MyOntModel.getInstance().getModel();
 
 			// create a user, store in ontology
 			String prefix = model.getNsPrefixURI("");
@@ -99,12 +97,13 @@ public class Application extends Controller {
 			iUser.addLabel(SHA1.getSHA1String(uid), null);
 			Iterator<String> it = json.fieldNames();
 			ModelUtil.addIndividualProperties(oUser, iUser, it, json);
+			MyOntModel.getInstance().updateModel(model);
 		}
 		return ok(JsonUtil.getTrueJson());
 	}
 
 	/**
-	 * register a app
+	 * register a service. It is uncompleted.
 	 * 
 	 * @return
 	 */
@@ -112,10 +111,10 @@ public class Application extends Controller {
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String sname = json.findPath("name").textValue();
-		String packagename = json.findPath("packagename").textValue();
 
-		MyDBManager manager = new MyDBManager();
-		manager.insertIntoServiceTable(sname, packagename);
+		// insert a row into service table
+		new MyDBManager().insertIntoServiceTable(sname,
+				SHA1.getSHA1String(sname));
 
 		return ok(JsonUtil.getTrueJson());
 	}

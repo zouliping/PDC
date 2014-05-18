@@ -85,15 +85,15 @@ public class MyDBManager {
 	 * insert a data into service table
 	 * 
 	 * @param name
-	 * @param packagename
+	 * @param token
 	 * @param appkey
 	 */
-	public void insertIntoServiceTable(String name, String packagename) {
-		String sql = "INSERT INTO service (name, packagename) values (?,?)";
+	public void insertIntoServiceTable(String name, String token) {
+		String sql = "INSERT INTO service (name, token) values (?,?)";
 		try {
 			ps = con.prepareStatement(sql);
 			ps.setString(1, name);
-			ps.setString(2, packagename);
+			ps.setString(2, token);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
