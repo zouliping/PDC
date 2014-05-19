@@ -15,6 +15,7 @@ import utils.JsonUtil;
 import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.SHA1;
+import utils.StringUtil;
 import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +38,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result login() {
-		// StringUtil.printStr(, StringUtil.START_TIME);
+		StringUtil.printStart("login");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String uid = json.findPath("id").textValue();
@@ -60,8 +61,10 @@ public class Application extends Controller {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
 
+			StringUtil.printEnd("login");
 			return ok(on);
 		} else {
+			StringUtil.printEnd("login");
 			return ok(JsonUtil.getFalseJson());
 		}
 	}
@@ -72,6 +75,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result registerUser() {
+		StringUtil.printStart("register user");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String uid = json.findPath("u_id").textValue();
@@ -84,7 +88,6 @@ public class Application extends Controller {
 
 		if (isDev) {
 			manager.insertIntoDevTable(uid, pwd, SHA1.getSHA1String(uid));
-
 		} else {
 			manager.insertIntoTable("users", "uid", uid, pwd,
 					SHA1.getSHA1String(uid));
@@ -100,6 +103,7 @@ public class Application extends Controller {
 			ModelUtil.addIndividualProperties(oUser, iUser, it, json);
 		}
 
+		StringUtil.printEnd("register user");
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -109,14 +113,23 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result registerApp() {
+		StringUtil.printStart("register service");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String sname = json.findPath("name").textValue();
+		String did = json.findPath("did").textValue();
+
+		// confirm whether dev is correct
+		if (!new MyDBManager().confirmDev(did)) {
+			StringUtil.printEnd("register service");
+			return ok(JsonUtil.getFalseJson());
+		}
 
 		// insert a row into service table
 		new MyDBManager().insertIntoServiceTable(sname,
 				SHA1.getSHA1String(sname));
 
+		StringUtil.printEnd("register service");
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -127,6 +140,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result setRules() {
+		StringUtil.printStart("set rules");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
@@ -135,6 +149,7 @@ public class Application extends Controller {
 
 		// confirm whether user is correct
 		if (!manager.confirmUser(uid)) {
+			StringUtil.printEnd("set rules");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -269,6 +284,7 @@ public class Application extends Controller {
 					proList.toArray(new String[proList.size()]), level);
 		}
 
+		StringUtil.printEnd("set rules");
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -278,6 +294,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result getOwlFile() {
+		StringUtil.printStart("get file");
 		OntModel model = MyOntModel.getInstance().getModel();
 		String fileName = "owl/pdc_ontology_" + System.currentTimeMillis()
 				+ ".rdf";
@@ -288,6 +305,7 @@ public class Application extends Controller {
 			model.write(fos);
 			fos.close();
 
+			StringUtil.printEnd("get file");
 			return ok(file);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -295,6 +313,7 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
+		StringUtil.printEnd("get file");
 		return ok(JsonUtil.getFalseJson());
 	}
 }

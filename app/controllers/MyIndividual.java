@@ -13,6 +13,7 @@ import utils.MyOntModel;
 import utils.PrivacyInterpreter;
 import utils.QueryUtil;
 import utils.SHA1;
+import utils.StringUtil;
 import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,6 +43,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result update() {
+		StringUtil.printStart("update individual");
 		JsonNode json = request().body().asJson();
 		System.out.println(json);
 
@@ -51,6 +53,7 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
+			StringUtil.printEnd("update individual");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -63,6 +66,7 @@ public class MyIndividual extends Controller {
 		System.out.println("get ont class time " + (b - a));
 
 		if (oc == null) {
+			StringUtil.printEnd("update individual");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -107,6 +111,7 @@ public class MyIndividual extends Controller {
 			ModelUtil.addIndividualProperties(oc, i, newList, json);
 		}
 
+		StringUtil.printEnd("update individual");
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -116,6 +121,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result addRelation() {
+		StringUtil.printStart("add relation (individual)");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
@@ -127,10 +133,12 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
+			StringUtil.printEnd("add relation (individual)");
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (classname1 == null || classname2 == null) {
+			StringUtil.printEnd("add relation (individual)");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -158,6 +166,7 @@ public class MyIndividual extends Controller {
 		ObjectProperty op = model.getObjectProperty(relation);
 
 		if (op == null) {
+			StringUtil.printEnd("add relation (individual)");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -167,6 +176,7 @@ public class MyIndividual extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
+		StringUtil.printEnd("add relation (individual)");
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -176,6 +186,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result removeRelation() {
+		StringUtil.printStart("remove relation (individual)");
 		JsonNode json = request().body().asJson();
 		System.out.println(json);
 		String indivi1 = json.findPath("indivi1").textValue();
@@ -185,10 +196,12 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
+			StringUtil.printEnd("remove relation (individual)");
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (indivi1 == null || indivi2 == null || relation == null) {
+			StringUtil.printEnd("remove relation (individual)");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -200,6 +213,7 @@ public class MyIndividual extends Controller {
 		OntProperty op = model.getOntProperty(prefix + relation);
 
 		if (i1 == null || i2 == null || op == null) {
+			StringUtil.printEnd("remove relation (individual)");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -208,6 +222,7 @@ public class MyIndividual extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
+		StringUtil.printEnd("remove relation (individual)");
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -219,6 +234,7 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result get(String classname, String uid, String uname,
 			String sid) {
+		StringUtil.printStart("get a class'a individuals");
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
 		System.out
@@ -233,11 +249,13 @@ public class MyIndividual extends Controller {
 		ObjectNode on = Json.newObject();
 
 		if (oc == null) {
+			StringUtil.printEnd("get a class'a individuals");
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
+			StringUtil.printEnd("get a class'a individuals");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -317,6 +335,7 @@ public class MyIndividual extends Controller {
 		}
 
 		System.out.println(on);
+		StringUtil.printEnd("get a class'a individuals");
 		return ok(on);
 	}
 
@@ -328,16 +347,19 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result getProperties(String individualname, String proname,
 			String uid, String uname, String sid) {
+		StringUtil.printStart("get a individual's properties");
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
+			StringUtil.printEnd("get a individual's properties");
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (individual == null) {
+			StringUtil.printEnd("get a individual's properties");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -392,6 +414,7 @@ public class MyIndividual extends Controller {
 		}
 
 		System.out.println(on);
+		StringUtil.printEnd("get a individual's properties");
 		return ok(on);
 	}
 
@@ -401,6 +424,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result getIndivByLabel() {
+		StringUtil.printStart("get a individual's labels");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
@@ -408,6 +432,7 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
+			StringUtil.printEnd("get a individual's labels");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -538,6 +563,7 @@ public class MyIndividual extends Controller {
 
 		QueryUtil.closeQE();
 		System.out.println(re);
+		StringUtil.printEnd("get a individual's labels");
 		return ok(re);
 	}
 
@@ -548,6 +574,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result remove() {
+		StringUtil.printStart("remove a individual");
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String indivname = json.findPath("indivname").textValue();
@@ -556,6 +583,7 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
+			StringUtil.printEnd("remove a individual");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -564,6 +592,7 @@ public class MyIndividual extends Controller {
 		Individual i = model.getIndividual(prefix + indivname);
 
 		if (i == null) {
+			StringUtil.printEnd("remove a individual");
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -580,12 +609,14 @@ public class MyIndividual extends Controller {
 			if (op != null) {
 				i.removeProperty(op, i.getPropertyValue(op));
 			} else {
+				StringUtil.printEnd("remove a individual");
 				return ok(JsonUtil.getFalseJson());
 			}
 		}
 		// update the model in db
 		MyOntModel.getInstance().updateModel(model);
 		System.out.println(JsonUtil.getTrueJson().toString());
+		StringUtil.printEnd("remove a individual");
 		return ok(JsonUtil.getTrueJson());
 	}
 }

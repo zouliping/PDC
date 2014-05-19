@@ -6,7 +6,7 @@
 GET		/							controllers.Application.index()
 PUT		/user/register				controllers.Application.registerUser()
 PUT 	/user/login					controllers.Application.login()
-PUT		/app/register				controllers.Application.registerApp()
+PUT		/service/register				controllers.Application.registerApp()
 PUT		/user/set_rules				controllers.Application.setRules()
 GET		/get/file					controllers.Application.getOwlFile()
 
