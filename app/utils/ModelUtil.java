@@ -71,7 +71,7 @@ public class ModelUtil {
 		if (oc == null) {
 			return null;
 		} else {
-			// true means listing all properties except relation(ObjectProperty)
+			// use the OWL_MEM, it may get not all properties
 			for (ExtendedIterator<OntProperty> i = oc.listDeclaredProperties(); i
 					.hasNext();) {
 				OntProperty op = (OntProperty) i.next();
@@ -199,7 +199,6 @@ public class ModelUtil {
 				String value = json.findPath(tmp).textValue();
 
 				if (value != null) {
-					// Charset.forName("UTF-8").encode(value);
 					i.addProperty(op, value);
 				}
 			}

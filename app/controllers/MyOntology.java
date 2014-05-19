@@ -42,8 +42,8 @@ public class MyOntology extends Controller {
 				.hasNext();) {
 			OntClass oc = (OntClass) i.next();
 
-			if (oc != null) {
-				if (!oc.toString().startsWith("http://www.w3.org/")) {
+			if (null != oc) {
+				if (!oc.toString().startsWith(StringUtil.CLASSNAME_PREFIX)) {
 					nameList.add(oc.getLocalName());
 				}
 			}
@@ -90,9 +90,7 @@ public class MyOntology extends Controller {
 
 		ResultSet results = QueryUtil.doQuery(model, queryString);
 
-		System.out.println("get relation " + classname1 + " " + classname2);
-
-		// Get property value
+		// Get relation value, a class and a class only can have one relation
 		String relationValue;
 		if (results.hasNext()) {
 			QuerySolution result = results.nextSolution();
@@ -183,18 +181,18 @@ public class MyOntology extends Controller {
 		if (ontClass1 == null || ontClass2 == null) {
 			return ok(JsonUtil.getFalseJson());
 		}
+		// in ontology, add relation need to add objectProperty and set domain
+		// and range for it.
 		op.setDomain(ontClass1);
 		op.setRange(ontClass2);
 
-		// StatementImpl stmt = new StatementImpl(ontClass1, op, ontClass2);
-		// model.add(stmt);
 		MyOntModel.getInstance().updateModel(model);
 
 		return ok(JsonUtil.getTrueJson());
 	}
 
 	/**
-	 * get label
+	 * get label. true means class label, false means property label.
 	 * 
 	 * @param isclass
 	 * @param name
@@ -203,9 +201,10 @@ public class MyOntology extends Controller {
 	public static Result getLabel(String isclass, String name) {
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
-		ArrayList<String> relationList = new ArrayList<String>();
+		ArrayList<String> labelList = new ArrayList<String>();
 
-		if ("true".equals(isclass) || "True".equals(isclass)) {
+		// class label
+		if ("true".equals(isclass) || "TRUE".equals(isclass)) {
 			OntClass oc = model.getOntClass(prefix + name);
 
 			if (oc == null) {
@@ -217,11 +216,12 @@ public class MyOntology extends Controller {
 				if (tmp.contains("^^")) {
 					tmp = tmp.substring(0, tmp.indexOf("^^"));
 				}
-				relationList.add(tmp);
+				labelList.add(tmp);
 			}
 
-			return ok(JsonUtil.addList2Json("label", relationList));
-		} else if ("false".equals(isclass) || "False".equals(isclass)) {
+			return ok(JsonUtil.addList2Json("label", labelList));
+		} else if ("false".equals(isclass) || "FALSE".equals(isclass)) {
+			// property label
 			OntProperty op = model.getOntProperty(prefix + name);
 
 			if (op == null) {
@@ -233,10 +233,10 @@ public class MyOntology extends Controller {
 				if (tmp.contains("^^")) {
 					tmp = tmp.substring(0, tmp.indexOf("^^"));
 				}
-				relationList.add(tmp);
+				labelList.add(tmp);
 			}
 
-			return ok(JsonUtil.addList2Json("label", relationList));
+			return ok(JsonUtil.addList2Json("label", labelList));
 		} else {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -280,6 +280,7 @@ public class MyOntology extends Controller {
 			if (len == 0) {
 				return ok(JsonUtil.getFalseJson());
 			} else if (len == 1) {
+				// set label to delete the existed labels
 				oc.setLabel(labelList.get(0), null);
 			} else {
 				oc.setLabel(labelList.get(0), null);
@@ -321,6 +322,11 @@ public class MyOntology extends Controller {
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
 		String owlPrefix = model.getNsPrefixURI("owl");
 
+		OntClass oct = model.getOntClass(defaultPrefix + classname);
+		if (classname == null || oct == null) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
 		// Create a new query to find classes which have labels
 		String queryString = "PREFIX default: <" + defaultPrefix + ">\n"
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
@@ -337,6 +343,7 @@ public class MyOntology extends Controller {
 			QuerySolution result = resultSet.nextSolution();
 			String name = result.get("class").toString();
 
+			// find out the classes
 			if (name.contains(defaultPrefix)) {
 				haveResult = true;
 				OntClass oc = model.getOntClass(name);
@@ -344,9 +351,6 @@ public class MyOntology extends Controller {
 
 				ArrayNode an = re.arrayNode();
 
-				if (proList == null) {
-					System.out.println("pro null");
-				}
 				for (String tmp : proList) {
 					an.add(tmp);
 				}
@@ -354,13 +358,14 @@ public class MyOntology extends Controller {
 				re.putArray(name.substring(defaultPrefix.length())).addAll(an);
 			}
 		}
+
 		QueryUtil.closeQE();
-		System.out.println(re);
+
 		if (haveResult) {
 			return ok(re);
 		} else {
+			// if a class does not have related classes, return "null"
 			return ok(StringUtil.STRING_NULL);
-			// if a class does not have related classes, return null
 		}
 
 	}

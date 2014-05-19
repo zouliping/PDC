@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import play.libs.Json;
-import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import utils.JsonUtil;
@@ -38,13 +37,10 @@ import db.MyDBManager;
 public class MyIndividual extends Controller {
 
 	/**
-	 * add a individual. client post a json, for example
-	 * {"classname":"Writing","individualname"
-	 * :"test","uid":"123456","booktitle":"titleTest"}
+	 * add a individual
 	 * 
 	 * @return
 	 */
-	@BodyParser.Of(BodyParser.Json.class)
 	public static Result update() {
 		JsonNode json = request().body().asJson();
 		System.out.println(json);
@@ -53,28 +49,28 @@ public class MyIndividual extends Controller {
 		String individualname = json.findPath("individualname").textValue();
 		String token = json.findPath("uid").textValue();
 
+		// confirm whether user is correct
+		if (!new MyDBManager().confirmUser(token)) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 
 		Long a = System.currentTimeMillis();
 		OntClass oc = model.getOntClass(prefix + classname);
 		Long b = System.currentTimeMillis();
-		System.out.println("getontclass time " + (b - a));
+		System.out.println("get ont class time " + (b - a));
+
 		if (oc == null) {
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		Individual i = model.getIndividual(prefix + individualname);
 		if (i == null) {
-			System.out.println("create indiv");
 			i = oc.createIndividual(prefix + individualname);
 			// set user label
 			i.addLabel(token, null);
-		}
-
-		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(token)) {
-			return ok(JsonUtil.getFalseJson());
 		}
 
 		String old_location;
@@ -87,7 +83,7 @@ public class MyIndividual extends Controller {
 			if ("classname".equals(pro) || "individualname".equals(pro)
 					|| "uid".equals(pro)) {
 			} else {
-				if (("User".equals(classname))
+				if ((UserUtil.userClassname.equals(classname))
 						&& ("u_current_location".equals(pro))) {
 					new_location = json.findPath(pro).textValue();
 					Individual individual = model.getIndividual(prefix + token);
@@ -134,8 +130,6 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		System.out.println(classname1 + "---" + classname2);
-
 		if (classname1 == null || classname2 == null) {
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -158,7 +152,6 @@ public class MyIndividual extends Controller {
 				id2 = tmp;
 			}
 		}
-		System.out.println(relation);
 		Individual i1 = model.getIndividual(prefix + id1);
 		Individual i2 = model.getIndividual(prefix + id2);
 
@@ -168,6 +161,7 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
+		// in individual, add relation just need to add a statement.
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
 		model.add(stmt);
 
@@ -253,14 +247,14 @@ public class MyIndividual extends Controller {
 		if (UserUtil.userClassname.equals(classname)) {
 			List<String> followers = ModelUtil.getFollowers(get_user);
 			for (String tmp : followers) {
-				// System.out.println(tmp);
 				Individual iFollower = model.getIndividual(tmp);
 				ObjectNode proNode = Json.newObject();
 				for (StmtIterator si = iFollower.listProperties(); si.hasNext();) {
 					StatementImpl sti = (StatementImpl) si.next();
 					if (list_privacy_pro.contains(sti.getPredicate()
 							.getLocalName())) {
-						// if the property is object property, add a
+						// if the property is object property, it may have many
+						// values, add a
 						// "+";else add a
 						// "-"
 						ArrayNode an = on.arrayNode();
@@ -321,6 +315,7 @@ public class MyIndividual extends Controller {
 				}
 			}
 		}
+
 		System.out.println(on);
 		return ok(on);
 	}
@@ -395,6 +390,7 @@ public class MyIndividual extends Controller {
 				}
 			}
 		}
+
 		System.out.println(on);
 		return ok(on);
 	}
@@ -427,6 +423,7 @@ public class MyIndividual extends Controller {
 				+ "PREFIX rdfs: <" + rdfsPrefix + ">\n" + "PREFIX owl: <"
 				+ owlPrefix + ">\n" + "SELECT ?tmp\n" + "WHERE { ";
 
+		// get the labels
 		JsonNode array = json.findPath("label");
 		if (array.isArray()) {
 			for (Iterator<JsonNode> it = array.elements(); it.hasNext();) {
@@ -437,6 +434,7 @@ public class MyIndividual extends Controller {
 			queryString += "}";
 		}
 
+		// get the filters
 		JsonNode array2 = json.findPath("filter");
 		ArrayList<String> list_filter = new ArrayList<String>();
 		if (array2.isArray()) {
@@ -446,7 +444,6 @@ public class MyIndividual extends Controller {
 			}
 		}
 
-		// System.out.println(queryString);
 		ResultSet resultSet = QueryUtil.doQuery(model, queryString);
 
 		Boolean isClass = json.path("isClass").asBoolean();
@@ -455,14 +452,12 @@ public class MyIndividual extends Controller {
 		while (resultSet.hasNext()) {
 			QuerySolution result = resultSet.nextSolution();
 			String name = result.get("tmp").toString();
-			System.out.println(name);
 
 			// deal with class label
 			if (isClass) {
 				OntClass oc = model.getOntClass(name);
 				for (ExtendedIterator<?> ei = oc.listInstances(); ei.hasNext();) {
 					Individual i = (Individual) ei.next();
-					System.out.println(i.getLocalName());
 					if (ModelUtil.isUserIndiv(i, uid)) {
 						ObjectNode tmp = Json.newObject();
 
@@ -505,12 +500,10 @@ public class MyIndividual extends Controller {
 				}
 
 				for (OntClass tmpClass : classList) {
-
+					// deal with property label, if developer sets the
+					// filter, it should be removed
 					if (!list_filter.contains(tmpClass.getLabel(null))) {
 
-						System.out.println("after filter------"
-								+ tmpClass.getLocalName() + "------"
-								+ tmpClass.getLabel(null));
 						for (ExtendedIterator<?> ei2 = tmpClass.listInstances(); ei2
 								.hasNext();) {
 							Individual individual = (Individual) ei2.next();
@@ -542,6 +535,7 @@ public class MyIndividual extends Controller {
 				}
 			}
 		}
+
 		QueryUtil.closeQE();
 		System.out.println(re);
 		return ok(re);
@@ -572,6 +566,8 @@ public class MyIndividual extends Controller {
 		if (i == null) {
 			return ok(JsonUtil.getFalseJson());
 		}
+
+		// if user do not set property name, delete the individual
 		if (proname == null) {
 			System.out.println("before remove");
 			Long a = System.currentTimeMillis();
@@ -579,6 +575,7 @@ public class MyIndividual extends Controller {
 			Long b = System.currentTimeMillis();
 			System.out.println("after remove and use " + (b - a));
 		} else {
+			// if user sets property name, delete the property
 			OntProperty op = model.getOntProperty(prefix + proname);
 			if (op != null) {
 				i.removeProperty(op, i.getPropertyValue(op));

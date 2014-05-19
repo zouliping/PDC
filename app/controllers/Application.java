@@ -59,6 +59,7 @@ public class Application extends Controller {
 		if (manager.query(sql)) {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
+
 			return ok(on);
 		} else {
 			return ok(JsonUtil.getFalseJson());
@@ -97,8 +98,8 @@ public class Application extends Controller {
 			iUser.addLabel(SHA1.getSHA1String(uid), null);
 			Iterator<String> it = json.fieldNames();
 			ModelUtil.addIndividualProperties(oUser, iUser, it, json);
-			MyOntModel.getInstance().updateModel(model);
 		}
+
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -120,7 +121,8 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * set privacy rules
+	 * set privacy rules. 0 means public, 1 means service-privacy, 2 means
+	 * friend-privacy
 	 * 
 	 * @return
 	 */
@@ -151,7 +153,7 @@ public class Application extends Controller {
 			}
 		}
 
-		// get sid and fid
+		// get sid, if user set service-privacy
 		ArrayList<String> gsidList = new ArrayList<String>();
 		ArrayList<String> gfidList = new ArrayList<String>();
 		if (level == 1) {
@@ -163,6 +165,7 @@ public class Application extends Controller {
 			}
 		}
 
+		// get fid, if user set friend-privacy
 		if (level == 2) {
 			JsonNode farray = json.findPath("fid");
 			if (farray.isArray()) {
@@ -178,12 +181,13 @@ public class Application extends Controller {
 						+ "\' and classname=\'" + classname + "\' and level = "
 						+ level)) {
 			if (level == 0) {
-
+				// level = 0: modify properties directly
 				manager.update(allpro,
 						proList.toArray(new String[proList.size()]), level,
 						classname, uid);
 			} else if (level == 1) {
-
+				// level = 1: if user set a existed service, delete it; else,
+				// insert it into rules table
 				ArrayList<String> ridList = manager
 						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
 								+ "\' and classname = \'" + classname
@@ -215,13 +219,14 @@ public class Application extends Controller {
 				String irid = manager.insertIntoRules(uid, classname, allpro,
 						proList.toArray(new String[proList.size()]), level);
 
-				// add new rules into table rules_friends
+				// add new rules into table rules_services
 				for (String sid : gsidList) {
 					manager.insertIntoRulesServices(irid, sid);
 				}
 
 			} else if (level == 2) {
-
+				// level = 2: if user set a existed friend, delete it; else,
+				// insert it into rules table
 				ArrayList<String> ridList = manager
 						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
 								+ "\' and classname = \'" + classname
@@ -253,14 +258,13 @@ public class Application extends Controller {
 				String irid = manager.insertIntoRules(uid, classname, allpro,
 						proList.toArray(new String[proList.size()]), level);
 
-				System.out.println("max id " + irid);
-
 				// add new rules into table rules_friends
 				for (String fid : gfidList) {
 					manager.insertIntoRulesFriends(irid, fid);
 				}
 			}
 		} else {
+			// user set a new rule
 			manager.insertIntoRules(uid, classname, allpro,
 					proList.toArray(new String[proList.size()]), level);
 		}
@@ -283,12 +287,14 @@ public class Application extends Controller {
 			FileOutputStream fos = new FileOutputStream(file);
 			model.write(fos);
 			fos.close();
+
 			return ok(file);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		return ok(JsonUtil.getFalseJson());
 	}
 }

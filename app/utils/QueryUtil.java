@@ -8,7 +8,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 
 public class QueryUtil {
-	
+
 	public static QueryExecution qe;
 
 	/**
@@ -24,7 +24,7 @@ public class QueryUtil {
 		// Execute the query and obtain results
 		qe = QueryExecutionFactory.create(query, model);
 		ResultSet resultSet = qe.execSelect();
-		// qe.close();
+
 		return resultSet;
 	}
 
