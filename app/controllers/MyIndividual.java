@@ -57,6 +57,11 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
+		if (classname == null || individualname == null) {
+			StringUtil.printEnd("update individual");
+			return ok(JsonUtil.getFalseJson());
+		}
+
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 
@@ -128,6 +133,8 @@ public class MyIndividual extends Controller {
 		String id1 = json.findPath("id1").textValue();
 		String id2 = json.findPath("id2").textValue();
 		String token = json.findPath("uid").textValue();
+
+		// if id is not existed individual name, classname will be null
 		String classname1 = ModelUtil.getClassname(id1);
 		String classname2 = ModelUtil.getClassname(id2);
 
@@ -163,6 +170,11 @@ public class MyIndividual extends Controller {
 		Individual i1 = model.getIndividual(prefix + id1);
 		Individual i2 = model.getIndividual(prefix + id2);
 
+		if (relation == null) {
+			StringUtil.printEnd("add relation (individual)");
+			return ok(JsonUtil.getFalseJson());
+		}
+
 		ObjectProperty op = model.getObjectProperty(relation);
 
 		if (op == null) {
@@ -189,8 +201,8 @@ public class MyIndividual extends Controller {
 		StringUtil.printStart("remove relation (individual)");
 		JsonNode json = request().body().asJson();
 		System.out.println(json);
-		String indivi1 = json.findPath("indivi1").textValue();
-		String indivi2 = json.findPath("indivi2").textValue();
+		String indivi1 = json.findPath("indiv1").textValue();
+		String indivi2 = json.findPath("indiv2").textValue();
 		String relation = json.findPath("relation").textValue();
 		String token = json.findPath("uid").textValue();
 
@@ -218,7 +230,19 @@ public class MyIndividual extends Controller {
 		}
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
-		model.remove(stmt);
+		if (model.contains(stmt)) {
+			model.remove(stmt);
+		} else {
+			stmt = new StatementImpl(i2, op, i1);
+			if (model.contains(stmt)) {
+				model.remove(stmt);
+			} else {
+				// if exchange the order, it does not contain the statement,
+				// return false
+				StringUtil.printEnd("remove relation (individual)");
+				return ok(JsonUtil.getFalseJson());
+			}
+		}
 
 		MyOntModel.getInstance().updateModel(model);
 

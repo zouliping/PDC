@@ -297,7 +297,7 @@ public class Application extends Controller {
 		StringUtil.printStart("get file");
 		OntModel model = MyOntModel.getInstance().getModel();
 		String fileName = "owl/pdc_ontology_" + System.currentTimeMillis()
-				+ ".rdf";
+				+ ".owl";
 		File file = new File(fileName);
 
 		try {

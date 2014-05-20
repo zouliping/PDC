@@ -113,10 +113,10 @@ public class PrivacyInterpreter {
 				}
 			}
 
-			System.out.println("is not user pro");
-			for (String pro : list_public_pro) {
-				System.out.println(pro);
-			}
+			// System.out.println("is not user pro");
+			// for (String pro : list_public_pro) {
+			// System.out.println(pro);
+			// }
 
 		}
 		return list_public_pro;
