@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import utils.DatabaseConfig;
 
@@ -169,6 +170,26 @@ public class MyDBManager {
 	}
 
 	/**
+	 * insert into rule table
+	 * 
+	 * @param datachange
+	 * @param action
+	 * @param uid
+	 */
+	public void insertIntoRuleTable(String datachange, String action, String uid) {
+		String sql = "INSERT INTO rule (datachange, action, uid) values (?,?)";
+		try {
+			ps = con.prepareStatement(sql);
+			ps.setString(1, datachange);
+			ps.setString(2, action);
+			ps.setString(3, uid);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * query
 	 * 
 	 * @param sql
@@ -263,6 +284,29 @@ public class MyDBManager {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * get datachange and action
+	 * 
+	 * @param uid
+	 * @return
+	 */
+	public HashMap<String, String> getAction(String uid) {
+		String sql = "SELECT datachange, action FROM rule WHERE uid = " + uid;
+		HashMap<String, String> map = new HashMap<String, String>();
+		try {
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				String key = rs.getString(1);
+				String value = rs.getString(2);
+				map.put(key, value);
+			}
+			return map;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**

@@ -35,7 +35,7 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result all() {
-		StringUtil.printStart("get all classes");
+		StringUtil.printStart(StringUtil.GET_ALL_CHASSES);
 		ArrayList<String> nameList = new ArrayList<String>();
 		model = MyOntModel.getInstance().getModel();
 
@@ -50,7 +50,7 @@ public class MyOntology extends Controller {
 			}
 		}
 
-		StringUtil.printEnd("get all classes");
+		StringUtil.printEnd(StringUtil.GET_ALL_CHASSES);
 		return ok(JsonUtil.addList2Json("classes", nameList));
 	}
 
@@ -61,16 +61,16 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result getProperties(String classname) {
-		StringUtil.printStart("get a class' properties");
+		StringUtil.printStart(StringUtil.GET_CLASS_PROPERTIES);
 		ArrayList<String> proList = ModelUtil.getPropertyList(classname);
 
 		if (proList == null) {
-			StringUtil.printEnd("get a class' properties");
+			StringUtil.printEnd(StringUtil.GET_CLASS_PROPERTIES);
 			return ok(JsonUtil.getFalseJson());
 		} else {
 			ObjectNode on = JsonUtil.addList2Json(classname, proList);
 			System.out.println(on);
-			StringUtil.printEnd("get a class' properties");
+			StringUtil.printEnd(StringUtil.GET_CLASS_PROPERTIES);
 			return ok(on);
 		}
 	}
@@ -83,7 +83,7 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result getRelation(String classname1, String classname2) {
-		StringUtil.printStart("get a relation (ontology)");
+		StringUtil.printStart(StringUtil.GET_CLASS_RELATION);
 		model = MyOntModel.getInstance().getModel();
 		String defaultPrefix = model.getNsPrefixURI("");
 		String rdfsPrefix = model.getNsPrefixURI("rdfs");
@@ -106,7 +106,7 @@ public class MyOntology extends Controller {
 					.substring(defaultPrefix.length());
 		} else {
 			relationValue = null;
-			StringUtil.printEnd("get a relation (ontology)");
+			StringUtil.printEnd(StringUtil.GET_CLASS_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -116,7 +116,7 @@ public class MyOntology extends Controller {
 		on.put("relation", relationValue);
 
 		System.out.println(on);
-		StringUtil.printEnd("get a relation (ontology)");
+		StringUtil.printEnd(StringUtil.GET_CLASS_RELATION);
 		return ok(on);
 	}
 
@@ -126,20 +126,20 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result add() {
-		StringUtil.printStart("add a class (ontology)");
+		StringUtil.printStart(StringUtil.ADD_CLASS);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String classname = json.findPath("classname").textValue();
 		String token = json.findPath("did").textValue();
 
 		if (classname == null) {
-			StringUtil.printEnd("add a class (ontology)");
+			StringUtil.printEnd(StringUtil.ADD_CLASS);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		// confirm whether dev is correct
 		if (!new MyDBManager().confirmDev(token)) {
-			StringUtil.printEnd("add a class (ontology)");
+			StringUtil.printEnd(StringUtil.ADD_CLASS);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -160,7 +160,7 @@ public class MyOntology extends Controller {
 			MyOntModel.getInstance().updateModel(model);
 		}
 
-		StringUtil.printEnd("add a class (ontology)");
+		StringUtil.printEnd(StringUtil.ADD_CLASS);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -170,7 +170,7 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result addRelation() {
-		StringUtil.printStart("add a relation (ontology)");
+		StringUtil.printStart(StringUtil.ADD_CLASS_RELATION);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String class1 = json.findPath("class1").textValue();
@@ -179,13 +179,13 @@ public class MyOntology extends Controller {
 		String token = json.findPath("did").textValue();
 
 		if (class1 == null || class2 == null || relation == null) {
-			StringUtil.printEnd("add a relation (ontology)");
+			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		// confirm whether dev is correct
 		if (!new MyDBManager().confirmDev(token)) {
-			StringUtil.printEnd("add a relation (ontology)");
+			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -197,7 +197,7 @@ public class MyOntology extends Controller {
 		ObjectProperty op = model.createObjectProperty(prefix + relation);
 
 		if (ontClass1 == null || ontClass2 == null) {
-			StringUtil.printEnd("add a relation (ontology)");
+			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 		// in ontology, add relation need to add objectProperty and set domain
@@ -207,7 +207,7 @@ public class MyOntology extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
-		StringUtil.printEnd("add a relation (ontology)");
+		StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -219,7 +219,7 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result getLabel(String isclass, String name) {
-		StringUtil.printStart("get labels (ontology)");
+		StringUtil.printStart(StringUtil.GET_LABEL);
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		ArrayList<String> labelList = new ArrayList<String>();
@@ -229,7 +229,7 @@ public class MyOntology extends Controller {
 			OntClass oc = model.getOntClass(prefix + name);
 
 			if (null == oc) {
-				StringUtil.printEnd("get labels (ontology)");
+				StringUtil.printEnd(StringUtil.GET_LABEL);
 				return ok(JsonUtil.getFalseJson());
 			}
 
@@ -241,14 +241,14 @@ public class MyOntology extends Controller {
 				labelList.add(tmp);
 			}
 
-			StringUtil.printEnd("get labels (ontology)");
+			StringUtil.printEnd(StringUtil.GET_LABEL);
 			return ok(JsonUtil.addList2Json("label", labelList));
 		} else if ("false".equals(isclass) || "FALSE".equals(isclass)) {
 			// property label
 			OntProperty op = model.getOntProperty(prefix + name);
 
 			if (op == null) {
-				StringUtil.printEnd("get labels (ontology)");
+				StringUtil.printEnd(StringUtil.GET_LABEL);
 				return ok(JsonUtil.getFalseJson());
 			}
 
@@ -260,10 +260,10 @@ public class MyOntology extends Controller {
 				labelList.add(tmp);
 			}
 
-			StringUtil.printEnd("get labels (ontology)");
+			StringUtil.printEnd(StringUtil.GET_LABEL);
 			return ok(JsonUtil.addList2Json("label", labelList));
 		} else {
-			StringUtil.printEnd("get labels (ontology)");
+			StringUtil.printEnd(StringUtil.GET_LABEL);
 			return ok(JsonUtil.getFalseJson());
 		}
 	}
@@ -274,7 +274,7 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result addLabel() {
-		StringUtil.printStart("add labels (ontology)");
+		StringUtil.printStart(StringUtil.ADD_LABEL);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		Boolean isClass = json.path("isClass").asBoolean();
@@ -283,7 +283,7 @@ public class MyOntology extends Controller {
 
 		// confirm whether dev is correct
 		if (!new MyDBManager().confirmDev(token)) {
-			StringUtil.printEnd("add labels (ontology)");
+			StringUtil.printEnd(StringUtil.ADD_LABEL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -302,12 +302,12 @@ public class MyOntology extends Controller {
 		if (isClass) {
 			OntClass oc = model.getOntClass(prefix + name);
 			if (oc == null) {
-				StringUtil.printEnd("add labels (ontology)");
+				StringUtil.printEnd(StringUtil.ADD_LABEL);
 				return ok(JsonUtil.getFalseJson());
 			}
 
 			if (len == 0) {
-				StringUtil.printEnd("add labels (ontology)");
+				StringUtil.printEnd(StringUtil.ADD_LABEL);
 				return ok(JsonUtil.getFalseJson());
 			} else if (len == 1) {
 				// set label to delete the existed labels
@@ -321,12 +321,12 @@ public class MyOntology extends Controller {
 		} else {
 			OntProperty op = model.getOntProperty(prefix + name);
 			if (op == null) {
-				StringUtil.printEnd("add labels (ontology)");
+				StringUtil.printEnd(StringUtil.ADD_LABEL);
 				return ok(JsonUtil.getFalseJson());
 			}
 
 			if (len == 0) {
-				StringUtil.printEnd("add labels (ontology)");
+				StringUtil.printEnd(StringUtil.ADD_LABEL);
 				return ok(JsonUtil.getFalseJson());
 			} else if (len == 1) {
 				op.setLabel(labelList.get(0), null);
@@ -338,7 +338,7 @@ public class MyOntology extends Controller {
 			}
 		}
 
-		StringUtil.printEnd("add labels (ontology)");
+		StringUtil.printEnd(StringUtil.ADD_LABEL);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -349,7 +349,7 @@ public class MyOntology extends Controller {
 	 * @return
 	 */
 	public static Result getRelatedClasses(String classname) {
-		StringUtil.printStart("get related classes");
+		StringUtil.printStart(StringUtil.GET_RELATED_CLASSES);
 		OntModel model = MyOntModel.getInstance().getModel();
 
 		// Get prefixes
@@ -359,7 +359,7 @@ public class MyOntology extends Controller {
 
 		OntClass oct = model.getOntClass(defaultPrefix + classname);
 		if (classname == null || oct == null) {
-			StringUtil.printEnd("get related classes");
+			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -399,10 +399,10 @@ public class MyOntology extends Controller {
 
 		if (haveResult) {
 			System.out.println(re);
-			StringUtil.printEnd("get related classes");
+			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			return ok(re);
 		} else {
-			StringUtil.printEnd("get related classes");
+			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			// if a class does not have related classes, return "null"
 			return ok(StringUtil.STRING_NULL);
 		}

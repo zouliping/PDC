@@ -43,7 +43,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result update() {
-		StringUtil.printStart("update individual");
+		StringUtil.printStart(StringUtil.UPDATE_INDIVIDUAL);
 		JsonNode json = request().body().asJson();
 		System.out.println(json);
 
@@ -53,12 +53,12 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
-			StringUtil.printEnd("update individual");
+			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (classname == null || individualname == null) {
-			StringUtil.printEnd("update individual");
+			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -71,7 +71,7 @@ public class MyIndividual extends Controller {
 		System.out.println("get ont class time " + (b - a));
 
 		if (oc == null) {
-			StringUtil.printEnd("update individual");
+			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -98,8 +98,8 @@ public class MyIndividual extends Controller {
 					Individual individual = model.getIndividual(prefix + token);
 					OntProperty op = model.getOntProperty(prefix + pro);
 					if (individual.getPropertyValue(op) != null) {
-						old_location = individual.getPropertyValue(op)
-								.toString();
+						old_location = StringUtil.removeSpecialChar(individual
+								.getPropertyValue(op).toString());
 						if (new_location != null && old_location != null
 								&& !(new_location.equals(old_location))) {
 							System.out.println("send notification");
@@ -116,7 +116,7 @@ public class MyIndividual extends Controller {
 			ModelUtil.addIndividualProperties(oc, i, newList, json);
 		}
 
-		StringUtil.printEnd("update individual");
+		StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -126,7 +126,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result addRelation() {
-		StringUtil.printStart("add relation (individual)");
+		StringUtil.printStart(StringUtil.ADD_INDIVIDUAL_RELATION);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
@@ -140,12 +140,12 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
-			StringUtil.printEnd("add relation (individual)");
+			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (classname1 == null || classname2 == null) {
-			StringUtil.printEnd("add relation (individual)");
+			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -171,14 +171,14 @@ public class MyIndividual extends Controller {
 		Individual i2 = model.getIndividual(prefix + id2);
 
 		if (relation == null) {
-			StringUtil.printEnd("add relation (individual)");
+			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		ObjectProperty op = model.getObjectProperty(relation);
 
 		if (op == null) {
-			StringUtil.printEnd("add relation (individual)");
+			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -188,7 +188,7 @@ public class MyIndividual extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
-		StringUtil.printEnd("add relation (individual)");
+		StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -198,7 +198,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result removeRelation() {
-		StringUtil.printStart("remove relation (individual)");
+		StringUtil.printStart(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 		JsonNode json = request().body().asJson();
 		System.out.println(json);
 		String indivi1 = json.findPath("indiv1").textValue();
@@ -208,12 +208,12 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
-			StringUtil.printEnd("remove relation (individual)");
+			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (indivi1 == null || indivi2 == null || relation == null) {
-			StringUtil.printEnd("remove relation (individual)");
+			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -225,7 +225,7 @@ public class MyIndividual extends Controller {
 		OntProperty op = model.getOntProperty(prefix + relation);
 
 		if (i1 == null || i2 == null || op == null) {
-			StringUtil.printEnd("remove relation (individual)");
+			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -239,14 +239,14 @@ public class MyIndividual extends Controller {
 			} else {
 				// if exchange the order, it does not contain the statement,
 				// return false
-				StringUtil.printEnd("remove relation (individual)");
+				StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 				return ok(JsonUtil.getFalseJson());
 			}
 		}
 
 		MyOntModel.getInstance().updateModel(model);
 
-		StringUtil.printEnd("remove relation (individual)");
+		StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -258,7 +258,7 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result get(String classname, String uid, String uname,
 			String sid) {
-		StringUtil.printStart("get a class'a individuals");
+		StringUtil.printStart(StringUtil.GET_INDIVIDUALS);
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
 		System.out
@@ -273,13 +273,13 @@ public class MyIndividual extends Controller {
 		ObjectNode on = Json.newObject();
 
 		if (oc == null) {
-			StringUtil.printEnd("get a class'a individuals");
+			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
-			StringUtil.printEnd("get a class'a individuals");
+			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -359,7 +359,7 @@ public class MyIndividual extends Controller {
 		}
 
 		System.out.println(on);
-		StringUtil.printEnd("get a class'a individuals");
+		StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 		return ok(on);
 	}
 
@@ -371,19 +371,19 @@ public class MyIndividual extends Controller {
 	 */
 	public static Result getProperties(String individualname, String proname,
 			String uid, String uname, String sid) {
-		StringUtil.printStart("get a individual's properties");
+		StringUtil.printStart(StringUtil.GET_INDIVIDUAL_PROPERTY);
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		Individual individual = model.getIndividual(prefix + individualname);
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
-			StringUtil.printEnd("get a individual's properties");
+			StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		if (individual == null) {
-			StringUtil.printEnd("get a individual's properties");
+			StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -438,7 +438,7 @@ public class MyIndividual extends Controller {
 		}
 
 		System.out.println(on);
-		StringUtil.printEnd("get a individual's properties");
+		StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
 		return ok(on);
 	}
 
@@ -448,7 +448,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result getIndivByLabel() {
-		StringUtil.printStart("get a individual's labels");
+		StringUtil.printStart(StringUtil.GET_BY_LABEL);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
@@ -456,7 +456,7 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
-			StringUtil.printEnd("get a individual's labels");
+			StringUtil.printEnd(StringUtil.GET_BY_LABEL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -587,7 +587,7 @@ public class MyIndividual extends Controller {
 
 		QueryUtil.closeQE();
 		System.out.println(re);
-		StringUtil.printEnd("get a individual's labels");
+		StringUtil.printEnd(StringUtil.GET_BY_LABEL);
 		return ok(re);
 	}
 
@@ -598,7 +598,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result remove() {
-		StringUtil.printStart("remove a individual");
+		StringUtil.printStart(StringUtil.REMOVE_INDIVIDUAL);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String indivname = json.findPath("indivname").textValue();
@@ -607,7 +607,7 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(token)) {
-			StringUtil.printEnd("remove a individual");
+			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -616,7 +616,7 @@ public class MyIndividual extends Controller {
 		Individual i = model.getIndividual(prefix + indivname);
 
 		if (i == null) {
-			StringUtil.printEnd("remove a individual");
+			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -633,14 +633,14 @@ public class MyIndividual extends Controller {
 			if (op != null) {
 				i.removeProperty(op, i.getPropertyValue(op));
 			} else {
-				StringUtil.printEnd("remove a individual");
+				StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
 				return ok(JsonUtil.getFalseJson());
 			}
 		}
 		// update the model in db
 		MyOntModel.getInstance().updateModel(model);
 		System.out.println(JsonUtil.getTrueJson().toString());
-		StringUtil.printEnd("remove a individual");
+		StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
 		return ok(JsonUtil.getTrueJson());
 	}
 }

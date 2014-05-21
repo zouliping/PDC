@@ -161,7 +161,6 @@ public class ModelUtil {
 					i.addProperty(op, value);
 				} else {
 					value = json.findPath(tmp).booleanValue() + "";
-					System.out.println("op:" + tmp + "   value:" + value);
 					if ((i.getPropertyValue(op)) != null) {
 						i.removeProperty(op, i.getPropertyValue(op));
 					}

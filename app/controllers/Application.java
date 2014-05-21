@@ -29,7 +29,7 @@ import db.MyDBManager;
 public class Application extends Controller {
 
 	public static Result index() {
-		return ok("hello pdc");
+		return ok(StringUtil.HELLO);
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result login() {
-		StringUtil.printStart("login");
+		StringUtil.printStart(StringUtil.LOGIN);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String uid = json.findPath("id").textValue();
@@ -61,10 +61,10 @@ public class Application extends Controller {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
 
-			StringUtil.printEnd("login");
+			StringUtil.printEnd(StringUtil.LOGIN);
 			return ok(on);
 		} else {
-			StringUtil.printEnd("login");
+			StringUtil.printEnd(StringUtil.LOGIN);
 			return ok(JsonUtil.getFalseJson());
 		}
 	}
@@ -75,7 +75,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result registerUser() {
-		StringUtil.printStart("register user");
+		StringUtil.printStart(StringUtil.REGISTER_USER);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String uid = json.findPath("u_id").textValue();
@@ -103,7 +103,7 @@ public class Application extends Controller {
 			ModelUtil.addIndividualProperties(oUser, iUser, it, json);
 		}
 
-		StringUtil.printEnd("register user");
+		StringUtil.printEnd(StringUtil.REGISTER_USER);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -113,7 +113,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result registerApp() {
-		StringUtil.printStart("register service");
+		StringUtil.printStart(StringUtil.REGISTER_APP);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 		String sname = json.findPath("name").textValue();
@@ -121,7 +121,7 @@ public class Application extends Controller {
 
 		// confirm whether dev is correct
 		if (!new MyDBManager().confirmDev(did)) {
-			StringUtil.printEnd("register service");
+			StringUtil.printEnd(StringUtil.REGISTER_APP);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -129,7 +129,7 @@ public class Application extends Controller {
 		new MyDBManager().insertIntoServiceTable(sname,
 				SHA1.getSHA1String(sname));
 
-		StringUtil.printEnd("register service");
+		StringUtil.printEnd(StringUtil.REGISTER_APP);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -140,7 +140,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result setRules() {
-		StringUtil.printStart("set rules");
+		StringUtil.printStart(StringUtil.SET_PRIVACY_RULE);
 		JsonNode json = request().body().asJson();
 		System.out.println(json.toString());
 
@@ -149,7 +149,7 @@ public class Application extends Controller {
 
 		// confirm whether user is correct
 		if (!manager.confirmUser(uid)) {
-			StringUtil.printEnd("set rules");
+			StringUtil.printEnd(StringUtil.SET_PRIVACY_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}
 
@@ -284,7 +284,7 @@ public class Application extends Controller {
 					proList.toArray(new String[proList.size()]), level);
 		}
 
-		StringUtil.printEnd("set rules");
+		StringUtil.printEnd(StringUtil.SET_PRIVACY_RULE);
 		return ok(JsonUtil.getTrueJson());
 	}
 
@@ -294,7 +294,7 @@ public class Application extends Controller {
 	 * @return
 	 */
 	public static Result getOwlFile() {
-		StringUtil.printStart("get file");
+		StringUtil.printStart(StringUtil.GET_OWL_FILE);
 		OntModel model = MyOntModel.getInstance().getModel();
 		String fileName = "owl/pdc_ontology_" + System.currentTimeMillis()
 				+ ".owl";
@@ -305,7 +305,7 @@ public class Application extends Controller {
 			model.write(fos);
 			fos.close();
 
-			StringUtil.printEnd("get file");
+			StringUtil.printEnd(StringUtil.GET_OWL_FILE);
 			return ok(file);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -313,7 +313,73 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
-		StringUtil.printEnd("get file");
+		StringUtil.printEnd(StringUtil.GET_OWL_FILE);
 		return ok(JsonUtil.getFalseJson());
 	}
+
+	/**
+	 * set data change rules
+	 * 
+	 * @return
+	 */
+	public static Result setDataChangeRule() {
+		StringUtil.printStart(StringUtil.SET_DATA_CHANGE_RULE);
+		JsonNode json = request().body().asJson();
+		String uid = json.findPath("uid").textValue();
+		String datachange = json.findPath("datachange").textValue();
+		String action = json.findPath("action").textValue();
+		MyDBManager manager = new MyDBManager();
+
+		// confirm whether user is correct
+		if (!manager.confirmUser(uid)) {
+			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		if (uid == null || datachange == null || action == null) {
+			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		manager.insertIntoRuleTable(datachange, action, uid);
+		StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
+		return ok(JsonUtil.getTrueJson());
+	}
+
+	/**
+	 * get data change rules
+	 * 
+	 * @return
+	 */
+	public static Result getDataChangeRule(String uid) {
+		StringUtil.printStart(StringUtil.GET_DATA_CHANGE_RULE);
+		if (uid == null) {
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		MyDBManager manager = new MyDBManager();
+
+		// confirm whether user is correct
+		if (!manager.confirmUser(uid)) {
+			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		HashMap<String, String> map = manager.getAction(uid);
+
+		if (map == null) {
+			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		ObjectNode on = Json.newObject();
+
+		for (String key : map.keySet()) {
+			on.put(key, map.get(key));
+		}
+
+		StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
+		return ok(on);
+	}
+
 }
