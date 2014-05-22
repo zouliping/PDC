@@ -325,6 +325,7 @@ public class Application extends Controller {
 	public static Result setDataChangeRule() {
 		StringUtil.printStart(StringUtil.SET_DATA_CHANGE_RULE);
 		JsonNode json = request().body().asJson();
+		System.out.println(json);
 		String uid = json.findPath("uid").textValue();
 		String datachange = json.findPath("datachange").textValue();
 		String action = json.findPath("action").textValue();
@@ -368,6 +369,7 @@ public class Application extends Controller {
 		HashMap<String, String> map = manager.getAction(uid);
 
 		if (map == null) {
+			System.out.println("map null");
 			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}

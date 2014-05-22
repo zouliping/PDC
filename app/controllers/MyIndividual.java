@@ -76,10 +76,14 @@ public class MyIndividual extends Controller {
 		}
 
 		Individual i = model.getIndividual(prefix + individualname);
+		String datachange = null;
 		if (i == null) {
 			i = oc.createIndividual(prefix + individualname);
 			// set user label
 			i.addLabel(token, null);
+			datachange = StringUtil.NEW_DATA + classname;
+		} else {
+			datachange = StringUtil.UPDATE_DATA + classname;
 		}
 
 		String old_location;
@@ -91,6 +95,7 @@ public class MyIndividual extends Controller {
 			String pro = it.next();
 			if ("classname".equals(pro) || "individualname".equals(pro)
 					|| "uid".equals(pro)) {
+				it.remove();
 			} else {
 				if ((UserUtil.userClassname.equals(classname))
 						&& ("u_current_location".equals(pro))) {
@@ -102,7 +107,6 @@ public class MyIndividual extends Controller {
 								.getPropertyValue(op).toString());
 						if (new_location != null && old_location != null
 								&& !(new_location.equals(old_location))) {
-							System.out.println("send notification");
 							UserUtil.sendNotification(old_location,
 									new_location, token);
 						}
@@ -115,6 +119,33 @@ public class MyIndividual extends Controller {
 		if (newList.size() > 0) {
 			ModelUtil.addIndividualProperties(oc, i, newList, json);
 		}
+
+		// user new a individual, return the json directly
+		// if user modify a individual, get the individual's properties
+		ObjectNode on = Json.newObject();
+
+		for (StmtIterator si = i.listProperties(); si.hasNext();) {
+			StatementImpl sti = (StatementImpl) si.next();
+			// ArrayNode an = on.arrayNode();
+			if (sti.getPredicate().toString().startsWith(prefix)) {
+				if (sti.getObject().toString().startsWith(prefix)) {
+					// ObjectProperty op = model.getObjectProperty(sti
+					// .getPredicate().toString());
+					// for (NodeIterator ni = i.listPropertyValues(op); ni
+					// .hasNext();) {
+					// an.add(ni.next().toString());
+					// }
+					// on.putArray(sti.getPredicate().getLocalName()).addAll(an);
+				} else {
+					on.put(sti.getPredicate().getLocalName(), StringUtil
+							.removeSpecialChar(sti.getObject().toString()));
+				}
+			}
+		}
+
+		on.put("datachange", datachange);
+		System.out.println(on.toString());
+		UserUtil.sendNotificationToU(datachange, on, token);
 
 		StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
 		return ok(JsonUtil.getTrueJson());

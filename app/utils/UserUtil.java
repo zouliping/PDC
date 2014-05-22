@@ -2,6 +2,8 @@ package utils;
 
 import java.util.Random;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import cn.jpush.api.JPushClient;
 import cn.jpush.api.MessageResult;
 
@@ -13,22 +15,46 @@ public class UserUtil {
 	public final static String appKey = "c8a93696166e0d270c045407";
 	public final static String sid = "portal";
 
-	public static Boolean sendNotification(String old_location,
+	/**
+	 * send notification to pdc for android
+	 * 
+	 * @param old_location
+	 * @param new_location
+	 * @param uid
+	 */
+	public static void sendNotification(String old_location,
 			String new_location, String uid) {
 		JPushClient client = new JPushClient(masterSecret, appKey);
-		System.out.println("no--" + getSendNo() + "---" + uid + "");
 		MessageResult result = client.sendNotificationWithAlias(getSendNo(),
 				uid, "PDC", "I moved from " + old_location + " to "
 						+ new_location + ".");
-		System.out.println(result.getErrcode() + "");
-		if (result.getErrcode() == 0) {
-			return true;
-		} else
-			return false;
+		System.out.println("send location change. result:"
+				+ result.getErrcode());
 	}
 
+	/**
+	 * get random number
+	 * 
+	 * @return
+	 */
 	public static int getSendNo() {
 		Random random = new Random();
 		return Math.abs(random.nextInt());
+	}
+
+	/**
+	 * send data change to proxy
+	 * 
+	 * @param title
+	 * @param data
+	 * @param uid
+	 */
+	public static void sendNotificationToU(String title, ObjectNode data,
+			String uid) {
+		JPushClient client = new JPushClient(masterSecret, appKey);
+		MessageResult result = client.sendNotificationWithAlias(getSendNo(),
+				uid, title, data.toString());
+		System.out.println("send data change. result:" + result.getErrcode()
+				+ "");
 	}
 }

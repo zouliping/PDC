@@ -177,7 +177,7 @@ public class MyDBManager {
 	 * @param uid
 	 */
 	public void insertIntoRuleTable(String datachange, String action, String uid) {
-		String sql = "INSERT INTO rule (datachange, action, uid) values (?,?)";
+		String sql = "INSERT INTO rule (datachange, action, uid) values (?,?,?)";
 		try {
 			ps = con.prepareStatement(sql);
 			ps.setString(1, datachange);
@@ -293,7 +293,8 @@ public class MyDBManager {
 	 * @return
 	 */
 	public HashMap<String, String> getAction(String uid) {
-		String sql = "SELECT datachange, action FROM rule WHERE uid = " + uid;
+		String sql = "SELECT datachange,action FROM rule WHERE uid = \'" + uid
+				+ "\'";
 		HashMap<String, String> map = new HashMap<String, String>();
 		try {
 			ResultSet rs = stmt.executeQuery(sql);
