@@ -120,30 +120,11 @@ public class MyIndividual extends Controller {
 			ModelUtil.addIndividualProperties(oc, i, newList, json);
 		}
 
-		// user new a individual, return the json directly
-		// if user modify a individual, get the individual's properties
 		ObjectNode on = Json.newObject();
 
-		for (StmtIterator si = i.listProperties(); si.hasNext();) {
-			StatementImpl sti = (StatementImpl) si.next();
-			// ArrayNode an = on.arrayNode();
-			if (sti.getPredicate().toString().startsWith(prefix)) {
-				if (sti.getObject().toString().startsWith(prefix)) {
-					// ObjectProperty op = model.getObjectProperty(sti
-					// .getPredicate().toString());
-					// for (NodeIterator ni = i.listPropertyValues(op); ni
-					// .hasNext();) {
-					// an.add(ni.next().toString());
-					// }
-					// on.putArray(sti.getPredicate().getLocalName()).addAll(an);
-				} else {
-					on.put(sti.getPredicate().getLocalName(), StringUtil
-							.removeSpecialChar(sti.getObject().toString()));
-				}
-			}
-		}
-
 		on.put("datachange", datachange);
+		on.put("indivname", individualname);
+
 		System.out.println(on.toString());
 		UserUtil.sendNotificationToU(datachange, on, token);
 

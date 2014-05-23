@@ -51,7 +51,8 @@ public class UserUtil {
 	 */
 	public static void sendNotificationToU(String title, ObjectNode data,
 			String uid) {
-		JPushClient client = new JPushClient(masterSecret, appKey);
+		JPushClient client = new JPushClient("5bb053079480cab0cebba021",
+				"cfce04873e352b0af05d7bc9");
 		MessageResult result = client.sendNotificationWithAlias(getSendNo(),
 				uid, title, data.toString());
 		System.out.println("send data change. result:" + result.getErrcode()
