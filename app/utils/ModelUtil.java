@@ -288,7 +288,6 @@ public class ModelUtil {
 		while (results.hasNext()) {
 			QuerySolution result = results.nextSolution();
 			String user = result.get("user").toString();
-			System.out.println(user);
 			users.add(user);
 		}
 		return users;

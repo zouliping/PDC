@@ -305,8 +305,15 @@ public class MyIndividual extends Controller {
 		// get user's followers
 		if (UserUtil.userClassname.equals(classname)) {
 			List<String> followers = ModelUtil.getFollowers(get_user);
-			for (String tmp : followers) {
-				Individual iFollower = model.getIndividual(tmp);
+
+			Integer indiv_size = followers.size();
+			Integer end = since + num;
+			if (end > indiv_size) {
+				end = indiv_size;
+			}
+
+			for (int i = since; i < end; i++) {
+				Individual iFollower = model.getIndividual(followers.get(i));
 				ObjectNode proNode = Json.newObject();
 				for (StmtIterator si = iFollower.listProperties(); si.hasNext();) {
 					StatementImpl sti = (StatementImpl) si.next();
