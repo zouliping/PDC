@@ -269,7 +269,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result get(String classname, String uid, String uname,
-			String sid) {
+			String sid, Integer since, Integer num) {
 		StringUtil.printStart(StringUtil.GET_INDIVIDUALS);
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
@@ -291,6 +291,11 @@ public class MyIndividual extends Controller {
 
 		// confirm whether user is correct
 		if (!new MyDBManager().confirmUser(uid)) {
+			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		if (since < 0 || num < 0) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -333,40 +338,63 @@ public class MyIndividual extends Controller {
 			}
 
 		} else {
-
 			// get class's individuals
-			for (ExtendedIterator<?> i = oc.listInstances(); i.hasNext();) {
-				Individual individual = (Individual) i.next();
-				if (ModelUtil.isUserIndiv(individual, get_user)) {
-					ObjectNode proNode = Json.newObject();
-					for (StmtIterator si = individual.listProperties(); si
-							.hasNext();) {
-						StatementImpl sti = (StatementImpl) si.next();
-						if (list_privacy_pro.contains(sti.getPredicate()
-								.getLocalName())) {
-							// if the property is object property, add a
-							// "+";else add a
-							// "-"
-							ArrayNode an = on.arrayNode();
-							if (sti.getObject().toString().startsWith(prefix)) {
-								ObjectProperty op = model.getObjectProperty(sti
-										.getPredicate().toString());
-								for (NodeIterator ni = individual
-										.listPropertyValues(op); ni.hasNext();) {
-									an.add(ni.next().toString());
-								}
-								proNode.putArray(
-										"+" + sti.getPredicate().getLocalName())
-										.addAll(an);
-							} else {
-								proNode.put("-"
-										+ sti.getPredicate().getLocalName(),
-										sti.getObject().toString());
+			List<?> tmp_list = oc.listInstances().toList();
+			Integer total = tmp_list.size();
+			Integer remove_num = 0;
+			Integer indiv_size = 0;
+
+			// from end to start
+			for (int i = total - 1; i > -1; i--) {
+				Individual individual = (Individual) tmp_list.get(i);
+
+				if (!ModelUtil.isUserIndiv(individual, get_user)) {
+					tmp_list.remove(i);
+					remove_num++;
+				}
+			}
+
+			indiv_size = total - remove_num;
+			if (since > indiv_size) {
+				StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
+				return ok(JsonUtil.getFalseJson());
+			}
+
+			Integer end = since + num;
+			if (end > indiv_size) {
+				end = indiv_size;
+			}
+
+			for (int i = since; i < end; i++) {
+				Individual individual = (Individual) tmp_list.get(i);
+				ObjectNode proNode = Json.newObject();
+				for (StmtIterator si = individual.listProperties(); si
+						.hasNext();) {
+					StatementImpl sti = (StatementImpl) si.next();
+					if (list_privacy_pro.contains(sti.getPredicate()
+							.getLocalName())) {
+						// if the property is object property, add a
+						// "+";else add a
+						// "-"
+						ArrayNode an = on.arrayNode();
+						if (sti.getObject().toString().startsWith(prefix)) {
+							ObjectProperty op = model.getObjectProperty(sti
+									.getPredicate().toString());
+							for (NodeIterator ni = individual
+									.listPropertyValues(op); ni.hasNext();) {
+								an.add(ni.next().toString());
 							}
+							proNode.putArray(
+									"+" + sti.getPredicate().getLocalName())
+									.addAll(an);
+						} else {
+							proNode.put(
+									"-" + sti.getPredicate().getLocalName(),
+									sti.getObject().toString());
 						}
 					}
-					on.put(individual.getLocalName(), proNode);
 				}
+				on.put(individual.getLocalName(), proNode);
 			}
 		}
 
