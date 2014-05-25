@@ -269,7 +269,7 @@ public class MyIndividual extends Controller {
 	 * @return
 	 */
 	public static Result get(String classname, String uid, String uname,
-			String sid, Integer since, Integer num) {
+			String sid, Integer page, Integer num) {
 		StringUtil.printStart(StringUtil.GET_INDIVIDUALS);
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
@@ -295,7 +295,7 @@ public class MyIndividual extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		if (since < 0 || num < 0) {
+		if (page < 0 || num < 0) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -307,12 +307,13 @@ public class MyIndividual extends Controller {
 			List<String> followers = ModelUtil.getFollowers(get_user);
 
 			Integer indiv_size = followers.size();
-			Integer end = since + num;
+			Integer end = (page + 1) * num;
+			Integer start = page * num;
 			if (end > indiv_size) {
 				end = indiv_size;
 			}
 
-			for (int i = since; i < end; i++) {
+			for (int i = start; i < end; i++) {
 				Individual iFollower = model.getIndividual(followers.get(i));
 				ObjectNode proNode = Json.newObject();
 				for (StmtIterator si = iFollower.listProperties(); si.hasNext();) {
@@ -362,17 +363,19 @@ public class MyIndividual extends Controller {
 			}
 
 			indiv_size = total - remove_num;
-			if (since > indiv_size) {
+			Integer end = (page + 1) * num;
+			Integer start = page * num;
+
+			if (start > indiv_size) {
 				StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 				return ok(JsonUtil.getFalseJson());
 			}
 
-			Integer end = since + num;
 			if (end > indiv_size) {
 				end = indiv_size;
 			}
 
-			for (int i = since; i < end; i++) {
+			for (int i = start; i < end; i++) {
 				Individual individual = (Individual) tmp_list.get(i);
 				ObjectNode proNode = Json.newObject();
 				for (StmtIterator si = individual.listProperties(); si
