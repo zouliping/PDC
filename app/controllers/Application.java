@@ -7,7 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
+import models.Dev;
+import models.Rule;
+import models.Rules;
+import models.Service;
+import models.Users;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -45,19 +51,21 @@ public class Application extends Controller {
 		String pwd = json.findPath("password").textValue();
 		Boolean isDev = json.findPath("isDev").asBoolean();
 
-		MyDBManager manager = new MyDBManager();
+		Boolean success = false;
 
-		// how to operate database correctly in controllers?
-		String sql = null;
 		if (isDev) {
-			sql = "SELECT * FROM dev WHERE dname=\'" + uid + "\' and dpwd=\'"
-					+ pwd + "\'";
+			Dev dev = Dev.find.where().icontains("dname", uid).findUnique();
+			if (dev != null && dev.dpwd.equals(pwd)) {
+				success = true;
+			}
 		} else {
-			sql = "SELECT * FROM users WHERE uid=\'" + uid + "\' and pwd=\'"
-					+ pwd + "\'";
+			Users user = Users.find.where().icontains("uid", uid).findUnique();
+			if (user != null && user.pwd.equals(pwd)) {
+				success = true;
+			}
 		}
 
-		if (manager.query(sql)) {
+		if (success) {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
 
@@ -80,28 +88,28 @@ public class Application extends Controller {
 		System.out.println(json.toString());
 		String uid = json.findPath("u_id").textValue();
 		String pwd = json.findPath("u_password").textValue();
-		// Boolean isDev = json.findPath("isDev").asBoolean();
-		Boolean isDev = false; // do not use developer registration, it is
-								// unsafe.
 
-		MyDBManager manager = new MyDBManager();
-
-		if (isDev) {
-			manager.insertIntoDevTable(uid, pwd, SHA1.getSHA1String(uid));
-		} else {
-			manager.insertIntoTable("users", "uid", uid, pwd,
-					SHA1.getSHA1String(uid));
-
-			OntModel model = MyOntModel.getInstance().getModel();
-
-			// create a user, store in ontology
-			String prefix = model.getNsPrefixURI("");
-			OntClass oUser = model.getOntClass(prefix + UserUtil.userClassname);
-			Individual iUser = oUser.createIndividual(prefix + uid);
-			iUser.addLabel(SHA1.getSHA1String(uid), null);
-			Iterator<String> it = json.fieldNames();
-			ModelUtil.addIndividualProperties(oUser, iUser, it, json);
+		// if the user is existed
+		if (Users.find.where().icontains("uid", uid).findList().size() > 0) {
+			StringUtil.printEnd(StringUtil.REGISTER_USER);
+			return ok(JsonUtil.getFalseJson());
 		}
+
+		Users users = new Users();
+		users.uid = uid;
+		users.pwd = pwd;
+		users.token = SHA1.getSHA1String(uid);
+		users.save();
+
+		OntModel model = MyOntModel.getInstance().getModel();
+
+		// create a user, store in ontology
+		String prefix = model.getNsPrefixURI("");
+		OntClass oUser = model.getOntClass(prefix + UserUtil.userClassname);
+		Individual iUser = oUser.createIndividual(prefix + uid);
+		iUser.addLabel(SHA1.getSHA1String(uid), null);
+		Iterator<String> it = json.fieldNames();
+		ModelUtil.addIndividualProperties(oUser, iUser, it, json);
 
 		StringUtil.printEnd(StringUtil.REGISTER_USER);
 		return ok(JsonUtil.getTrueJson());
@@ -125,9 +133,10 @@ public class Application extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		// insert a row into service table
-		new MyDBManager().insertIntoServiceTable(sname,
-				SHA1.getSHA1String(sname));
+		Service service = new Service();
+		service.name = sname;
+		service.token = SHA1.getSHA1String(sname);
+		service.save();
 
 		StringUtil.printEnd(StringUtil.REGISTER_APP);
 		return ok(JsonUtil.getTrueJson());
@@ -189,6 +198,9 @@ public class Application extends Controller {
 				}
 			}
 		}
+
+		// Rules.find.where().icontains("uid", uid).icontains("classname",
+		// classname).
 
 		// if the rule is existed, modify the properties
 		if (manager
@@ -329,10 +341,9 @@ public class Application extends Controller {
 		String uid = json.findPath("uid").textValue();
 		String datachange = json.findPath("datachange").textValue();
 		String action = json.findPath("action").textValue();
-		MyDBManager manager = new MyDBManager();
 
 		// confirm whether user is correct
-		if (!manager.confirmUser(uid)) {
+		if (!new MyDBManager().confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -342,7 +353,19 @@ public class Application extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		manager.insertIntoRuleTable(datachange, action, uid);
+		// if the rule is existed
+		if (Rule.find.where().icontains("datachange", datachange).findList()
+				.size() > 0) {
+			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
+			return ok(JsonUtil.getFalseJson());
+		}
+
+		Rule rule = new Rule();
+		rule.action = action;
+		rule.datachange = datachange;
+		rule.uid = uid;
+		rule.save();
+
 		StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
 		return ok(JsonUtil.getTrueJson());
 	}
@@ -358,26 +381,24 @@ public class Application extends Controller {
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		MyDBManager manager = new MyDBManager();
-
 		// confirm whether user is correct
-		if (!manager.confirmUser(uid)) {
+		if (!new MyDBManager().confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}
 
-		HashMap<String, String> map = manager.getAction(uid);
-
-		if (map == null) {
-			System.out.println("map null");
+		List<Rule> list_rule = Rule.find.where().icontains("uid", uid)
+				.findList();
+		System.out.println(list_rule.size());
+		if (list_rule.size() <= 0) {
 			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}
 
 		ObjectNode on = Json.newObject();
 
-		for (String key : map.keySet()) {
-			on.put(key, map.get(key));
+		for (Rule rule : list_rule) {
+			on.put(rule.datachange, rule.action);
 		}
 
 		StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
