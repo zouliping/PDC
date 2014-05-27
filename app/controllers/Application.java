@@ -33,8 +33,6 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 
-import db.MyDBManager;
-
 public class Application extends Controller {
 
 	public static Result index() {
@@ -131,7 +129,7 @@ public class Application extends Controller {
 		String did = json.findPath("did").textValue();
 
 		// confirm whether dev is correct
-		if (!new MyDBManager().confirmDev(did)) {
+		if (!UserUtil.confirmDev(did)) {
 			StringUtil.printEnd(StringUtil.REGISTER_APP);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -157,10 +155,9 @@ public class Application extends Controller {
 		System.out.println(json.toString());
 
 		String uid = json.findPath("uid").textValue();
-		MyDBManager manager = new MyDBManager();
 
 		// confirm whether user is correct
-		if (!manager.confirmUser(uid)) {
+		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.SET_PRIVACY_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -406,7 +403,7 @@ public class Application extends Controller {
 		String action = json.findPath("action").textValue();
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(uid)) {
+		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -445,7 +442,7 @@ public class Application extends Controller {
 		}
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(uid)) {
+		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
 			return ok(JsonUtil.getFalseJson());
 		}

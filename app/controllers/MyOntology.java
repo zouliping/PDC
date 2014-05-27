@@ -11,6 +11,7 @@ import utils.ModelUtil;
 import utils.MyOntModel;
 import utils.QueryUtil;
 import utils.StringUtil;
+import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -22,8 +23,6 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-
-import db.MyDBManager;
 
 public class MyOntology extends Controller {
 
@@ -138,7 +137,7 @@ public class MyOntology extends Controller {
 		}
 
 		// confirm whether dev is correct
-		if (!new MyDBManager().confirmDev(token)) {
+		if (!UserUtil.confirmDev(token)) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -184,7 +183,7 @@ public class MyOntology extends Controller {
 		}
 
 		// confirm whether dev is correct
-		if (!new MyDBManager().confirmDev(token)) {
+		if (!UserUtil.confirmDev(token)) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -282,7 +281,7 @@ public class MyOntology extends Controller {
 		String token = json.findPath("did").textValue();
 
 		// confirm whether dev is correct
-		if (!new MyDBManager().confirmDev(token)) {
+		if (!UserUtil.confirmDev(token)) {
 			StringUtil.printEnd(StringUtil.ADD_LABEL);
 			return ok(JsonUtil.getFalseJson());
 		}

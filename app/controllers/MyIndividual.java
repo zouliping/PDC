@@ -33,8 +33,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
-import db.MyDBManager;
-
 public class MyIndividual extends Controller {
 
 	/**
@@ -52,7 +50,7 @@ public class MyIndividual extends Controller {
 		String token = json.findPath("uid").textValue();
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(token)) {
+		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -151,7 +149,7 @@ public class MyIndividual extends Controller {
 		String classname2 = ModelUtil.getClassname(id2);
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(token)) {
+		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -219,7 +217,7 @@ public class MyIndividual extends Controller {
 		String token = json.findPath("uid").textValue();
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(token)) {
+		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -290,7 +288,7 @@ public class MyIndividual extends Controller {
 		}
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(uid)) {
+		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -427,7 +425,7 @@ public class MyIndividual extends Controller {
 		Individual individual = model.getIndividual(prefix + individualname);
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(uid)) {
+		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -505,7 +503,7 @@ public class MyIndividual extends Controller {
 		String uid = json.findPath("uid").textValue();
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(uid)) {
+		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_BY_LABEL);
 			return ok(JsonUtil.getFalseJson());
 		}
@@ -656,7 +654,7 @@ public class MyIndividual extends Controller {
 		String token = json.findPath("uid").textValue();
 
 		// confirm whether user is correct
-		if (!new MyDBManager().confirmUser(token)) {
+		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
 			return ok(JsonUtil.getFalseJson());
 		}

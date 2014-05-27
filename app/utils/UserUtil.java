@@ -2,10 +2,12 @@ package utils;
 
 import java.util.Random;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import models.Dev;
+import models.Users;
 import cn.jpush.api.JPushClient;
 import cn.jpush.api.MessageResult;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class UserUtil {
 
@@ -57,5 +59,33 @@ public class UserUtil {
 				uid, title, data.toString());
 		System.out.println("send data change. result:" + result.getErrcode()
 				+ "");
+	}
+
+	/**
+	 * confirm user
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public static Boolean confirmUser(String token) {
+		if (Users.find.where().eq("token", token).findUnique() != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * confirm dev
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public static Boolean confirmDev(String token) {
+		if (Dev.find.where().eq("dtoken", token).findUnique() != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
