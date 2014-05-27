@@ -12,6 +12,8 @@ import java.util.List;
 import models.Dev;
 import models.Rule;
 import models.Rules;
+import models.RulesFriends;
+import models.RulesServices;
 import models.Service;
 import models.Users;
 import play.libs.Json;
@@ -26,6 +28,7 @@ import utils.UserUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Joiner;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -199,34 +202,30 @@ public class Application extends Controller {
 			}
 		}
 
-		// Rules.find.where().icontains("uid", uid).icontains("classname",
-		// classname).
+		List<Rules> list_rules = Rules.find.where().eq("uid", uid)
+				.eq("classname", classname).eq("level", level).findList();
 
 		// if the rule is existed, modify the properties
-		if (manager
-				.query("SELECT * FROM rules WHERE uid=\'" + uid
-						+ "\' and classname=\'" + classname + "\' and level = "
-						+ level)) {
+		if (list_rules.size() > 0) {
 			if (level == 0) {
 				// level = 0: modify properties directly
-				manager.update(allpro,
-						proList.toArray(new String[proList.size()]), level,
-						classname, uid);
+				Rules rules = Rules.find.where().icontains("uid", uid)
+						.icontains("classname", classname).eq("level", level)
+						.findUnique();
+				rules.allpro = allpro;
+				rules.setPro(proList);
+				rules.save();
+
 			} else if (level == 1) {
 				// level = 1: if user set a existed service, delete it; else,
 				// insert it into rules table
-				ArrayList<String> ridList = manager
-						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
-								+ "\' and classname = \'" + classname
-								+ "\' and level = " + level);
-				HashMap<String, String> sidMap = new HashMap<String, String>();
-				for (String rid : ridList) {
-					ArrayList<String> tmp = manager
-							.getList("SELECT sid FROM rules_services where rid = \'"
-									+ rid + "\'");
-					HashMap<String, String> tmpMap = new HashMap<String, String>();
-					for (String tsid : tmp) {
-						tmpMap.put(tsid, rid);
+				HashMap<String, Integer> sidMap = new HashMap<String, Integer>();
+				for (Rules rules : list_rules) {
+					List<RulesServices> list_rule = RulesServices.find.where()
+							.eq("rid", rules.rid).findList();
+					HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
+					for (RulesServices rs : list_rule) {
+						tmpMap.put(rs.sid, rules.rid);
 					}
 					sidMap.putAll(tmpMap);
 				}
@@ -234,38 +233,54 @@ public class Application extends Controller {
 				// delete existed rules
 				for (String es : gsidList) {
 					if (sidMap.containsKey(es)) {
-						manager.delete("DELETE FROM rules_services WHERE sid = \'"
-								+ es
-								+ "\' and rid = \'"
-								+ sidMap.get(es)
-								+ "\'");
+						RulesServices rs = RulesServices.find.where()
+								.eq("sid", es).eq("rid", sidMap.get(es))
+								.findUnique();
+						rs.delete();
 					}
 				}
 
-				// add new rules into table rules
-				String irid = manager.insertIntoRules(uid, classname, allpro,
-						proList.toArray(new String[proList.size()]), level);
+				Rules new_rules = Rules.find.where().eq("uid", uid)
+						.eq("classname", classname).eq("allpro", allpro)
+						.eq("level", level)
+						.eq("pro", Joiner.on(";").join(proList)).findUnique();
+				if (new_rules == null) {
+					// add new rules into table rules
+					Rules rules = new Rules();
+					rules.uid = uid;
+					rules.classname = classname;
+					rules.allpro = allpro;
+					rules.level = level;
+					rules.setPro(proList);
+					rules.save();
+
+					new_rules = Rules.find.where().eq("uid", uid)
+							.eq("classname", classname).eq("allpro", allpro)
+							.eq("level", level)
+							.eq("pro", Joiner.on(";").join(proList))
+							.findUnique();
+				}
+
+				Integer irid = new_rules.rid;
 
 				// add new rules into table rules_services
 				for (String sid : gsidList) {
-					manager.insertIntoRulesServices(irid, sid);
+					RulesServices rule = new RulesServices();
+					rule.rid = irid;
+					rule.sid = sid;
+					rule.save();
 				}
 
 			} else if (level == 2) {
 				// level = 2: if user set a existed friend, delete it; else,
 				// insert it into rules table
-				ArrayList<String> ridList = manager
-						.getList("SELECT rid FROM rules WHERE uid = \'" + uid
-								+ "\' and classname = \'" + classname
-								+ "\' and level = " + level);
-				HashMap<String, String> fidMap = new HashMap<String, String>();
-				for (String rid : ridList) {
-					ArrayList<String> tmp = manager
-							.getList("SELECT fid FROM rules_friends where rid = \'"
-									+ rid + "\'");
-					HashMap<String, String> tmpMap = new HashMap<String, String>();
-					for (String tfid : tmp) {
-						tmpMap.put(tfid, rid);
+				HashMap<String, Integer> fidMap = new HashMap<String, Integer>();
+				for (Rules rules : list_rules) {
+					List<RulesFriends> list_rule = RulesFriends.find.where()
+							.eq("rid", rules.rid).findList();
+					HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
+					for (RulesFriends rf : list_rule) {
+						tmpMap.put(rf.fid, rules.rid);
 					}
 					fidMap.putAll(tmpMap);
 				}
@@ -273,27 +288,75 @@ public class Application extends Controller {
 				// delete existed rules
 				for (String ef : gfidList) {
 					if (fidMap.containsKey(ef)) {
-						manager.delete("DELETE FROM rules_friends WHERE fid = \'"
-								+ ef
-								+ "\' and rid = \'"
-								+ fidMap.get(ef)
-								+ "\'");
+						RulesFriends rf = RulesFriends.find.where()
+								.eq("fid", ef).eq("rid", fidMap.get(ef))
+								.findUnique();
+						rf.delete();
 					}
 				}
 
-				// add new rules into table rules
-				String irid = manager.insertIntoRules(uid, classname, allpro,
-						proList.toArray(new String[proList.size()]), level);
+				Rules new_rule = Rules.find.where().eq("uid", uid)
+						.eq("classname", classname).eq("allpro", allpro)
+						.eq("level", level)
+						.eq("pro", Joiner.on(";").join(proList)).findUnique();
+				if (new_rule == null) {
+					// add new rules into table rules
+					Rules rules = new Rules();
+					rules.uid = uid;
+					rules.classname = classname;
+					rules.allpro = allpro;
+					rules.level = level;
+					rules.setPro(proList);
+					rules.save();
+
+					new_rule = Rules.find.where().eq("uid", uid)
+							.eq("classname", classname).eq("allpro", allpro)
+							.eq("level", level)
+							.eq("pro", Joiner.on(";").join(proList))
+							.findUnique();
+				}
+
+				Integer irid = new_rule.rid;
 
 				// add new rules into table rules_friends
 				for (String fid : gfidList) {
-					manager.insertIntoRulesFriends(irid, fid);
+					RulesFriends rf = new RulesFriends();
+					rf.rid = irid;
+					rf.fid = fid;
+					rf.save();
 				}
+
 			}
 		} else {
 			// user set a new rule
-			manager.insertIntoRules(uid, classname, allpro,
-					proList.toArray(new String[proList.size()]), level);
+			Rules rules = new Rules();
+			rules.uid = uid;
+			rules.classname = classname;
+			rules.allpro = allpro;
+			rules.level = level;
+			rules.setPro(proList);
+			rules.save();
+
+			Integer irid = Rules.find.where().eq("uid", uid)
+					.eq("classname", classname).eq("allpro", allpro)
+					.eq("level", level).eq("pro", Joiner.on(";").join(proList))
+					.findUnique().rid;
+
+			if (level == 1) {
+				for (String sid : gsidList) {
+					RulesServices rule = new RulesServices();
+					rule.rid = irid;
+					rule.sid = sid;
+					rule.save();
+				}
+			} else if (level == 2) {
+				for (String fid : gfidList) {
+					RulesFriends rf = new RulesFriends();
+					rf.rid = irid;
+					rf.fid = fid;
+					rf.save();
+				}
+			}
 		}
 
 		StringUtil.printEnd(StringUtil.SET_PRIVACY_RULE);
