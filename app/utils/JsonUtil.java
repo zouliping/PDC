@@ -25,9 +25,10 @@ public class JsonUtil {
 	 * 
 	 * @return
 	 */
-	public static ObjectNode getFalseJson() {
+	public static ObjectNode getFalseJson(Integer error) {
 		ObjectNode result = Json.newObject();
-		result.put("result", false);
+		result.put("result", error);
+		System.out.println(result);
 		return result;
 	}
 

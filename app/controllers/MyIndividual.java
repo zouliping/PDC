@@ -52,12 +52,12 @@ public class MyIndividual extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		if (classname == null || individualname == null) {
 			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -70,7 +70,7 @@ public class MyIndividual extends Controller {
 
 		if (oc == null) {
 			StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		Individual i = model.getIndividual(prefix + individualname);
@@ -151,12 +151,12 @@ public class MyIndividual extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		if (classname1 == null || classname2 == null) {
 			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -182,14 +182,14 @@ public class MyIndividual extends Controller {
 
 		if (relation == null) {
 			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		ObjectProperty op = model.getObjectProperty(relation);
 
 		if (op == null) {
 			StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		// in individual, add relation just need to add a statement.
@@ -219,12 +219,12 @@ public class MyIndividual extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		if (indivi1 == null || indivi2 == null || relation == null) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -236,7 +236,7 @@ public class MyIndividual extends Controller {
 
 		if (i1 == null || i2 == null || op == null) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
@@ -250,7 +250,7 @@ public class MyIndividual extends Controller {
 				// if exchange the order, it does not contain the statement,
 				// return false
 				StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 		}
 
@@ -284,18 +284,18 @@ public class MyIndividual extends Controller {
 
 		if (oc == null) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		if (page < 0 || num < 0) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		String get_user = SHA1.getSHA1String(uname);
@@ -366,7 +366,7 @@ public class MyIndividual extends Controller {
 
 			if (start > indiv_size) {
 				StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 
 			if (end > indiv_size) {
@@ -427,12 +427,12 @@ public class MyIndividual extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		if (individual == null) {
 			StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
@@ -465,7 +465,7 @@ public class MyIndividual extends Controller {
 		} else {
 			OntProperty op = model.getOntProperty(prefix + proname);
 			if (individual.getPropertyValue(op) == null) {
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 			if (list_privacy_pro.contains(proname)) {
 				if (individual.getPropertyValue(op).toString()
@@ -505,7 +505,7 @@ public class MyIndividual extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_BY_LABEL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -656,7 +656,7 @@ public class MyIndividual extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(token)) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -665,7 +665,7 @@ public class MyIndividual extends Controller {
 
 		if (i == null) {
 			StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		// if user do not set property name, delete the individual
@@ -682,7 +682,7 @@ public class MyIndividual extends Controller {
 				i.removeProperty(op, i.getPropertyValue(op));
 			} else {
 				StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 		}
 		// update the model in db

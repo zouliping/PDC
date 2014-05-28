@@ -65,7 +65,7 @@ public class MyOntology extends Controller {
 
 		if (proList == null) {
 			StringUtil.printEnd(StringUtil.GET_CLASS_PROPERTIES);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		} else {
 			ObjectNode on = JsonUtil.addList2Json(classname, proList);
 			System.out.println(on);
@@ -106,7 +106,7 @@ public class MyOntology extends Controller {
 		} else {
 			relationValue = null;
 			StringUtil.printEnd(StringUtil.GET_CLASS_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 
 		QueryUtil.closeQE();
@@ -133,13 +133,13 @@ public class MyOntology extends Controller {
 
 		if (classname == null) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(token)) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1003));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -179,13 +179,13 @@ public class MyOntology extends Controller {
 
 		if (class1 == null || class2 == null || relation == null) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(token)) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1003));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -197,7 +197,7 @@ public class MyOntology extends Controller {
 
 		if (ontClass1 == null || ontClass2 == null) {
 			StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 		// in ontology, add relation need to add objectProperty and set domain
 		// and range for it.
@@ -229,7 +229,7 @@ public class MyOntology extends Controller {
 
 			if (null == oc) {
 				StringUtil.printEnd(StringUtil.GET_LABEL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 
 			for (ExtendedIterator<?> ei = oc.listLabels(null); ei.hasNext();) {
@@ -248,7 +248,7 @@ public class MyOntology extends Controller {
 
 			if (op == null) {
 				StringUtil.printEnd(StringUtil.GET_LABEL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 
 			for (ExtendedIterator<?> ei = op.listLabels(null); ei.hasNext();) {
@@ -263,7 +263,7 @@ public class MyOntology extends Controller {
 			return ok(JsonUtil.addList2Json("label", labelList));
 		} else {
 			StringUtil.printEnd(StringUtil.GET_LABEL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1007));
 		}
 	}
 
@@ -283,7 +283,7 @@ public class MyOntology extends Controller {
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(token)) {
 			StringUtil.printEnd(StringUtil.ADD_LABEL);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1003));
 		}
 
 		JsonNode array = json.findPath("label");
@@ -302,12 +302,12 @@ public class MyOntology extends Controller {
 			OntClass oc = model.getOntClass(prefix + name);
 			if (oc == null) {
 				StringUtil.printEnd(StringUtil.ADD_LABEL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 
 			if (len == 0) {
 				StringUtil.printEnd(StringUtil.ADD_LABEL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1006));
 			} else if (len == 1) {
 				// set label to delete the existed labels
 				oc.setLabel(labelList.get(0), null);
@@ -321,12 +321,12 @@ public class MyOntology extends Controller {
 			OntProperty op = model.getOntProperty(prefix + name);
 			if (op == null) {
 				StringUtil.printEnd(StringUtil.ADD_LABEL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1007));
 			}
 
 			if (len == 0) {
 				StringUtil.printEnd(StringUtil.ADD_LABEL);
-				return ok(JsonUtil.getFalseJson());
+				return ok(JsonUtil.getFalseJson(1006));
 			} else if (len == 1) {
 				op.setLabel(labelList.get(0), null);
 			} else {
@@ -359,7 +359,7 @@ public class MyOntology extends Controller {
 		OntClass oct = model.getOntClass(defaultPrefix + classname);
 		if (classname == null || oct == null) {
 			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		// Create a new query to find classes which have labels

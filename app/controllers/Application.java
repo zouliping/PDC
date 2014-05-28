@@ -74,7 +74,7 @@ public class Application extends Controller {
 			return ok(on);
 		} else {
 			StringUtil.printEnd(StringUtil.LOGIN);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1001));
 		}
 	}
 
@@ -93,7 +93,7 @@ public class Application extends Controller {
 		// if the user is existed
 		if (Users.find.where().icontains("uid", uid).findList().size() > 0) {
 			StringUtil.printEnd(StringUtil.REGISTER_USER);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1002));
 		}
 
 		Users users = new Users();
@@ -131,16 +131,22 @@ public class Application extends Controller {
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(did)) {
 			StringUtil.printEnd(StringUtil.REGISTER_APP);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1003));
 		}
 
-		Service service = new Service();
-		service.name = sname;
-		service.token = SHA1.getSHA1String(sname);
-		service.save();
+		Service service = Service.find.where().eq("name", sname).findUnique();
+		if (service != null) {
+			StringUtil.printEnd(StringUtil.REGISTER_APP);
+			return ok(JsonUtil.getFalseJson(1008));
+		} else {
+			service = new Service();
+			service.name = sname;
+			service.token = SHA1.getSHA1String(sname);
+			service.save();
 
-		StringUtil.printEnd(StringUtil.REGISTER_APP);
-		return ok(JsonUtil.getTrueJson());
+			StringUtil.printEnd(StringUtil.REGISTER_APP);
+			return ok(JsonUtil.getTrueJson());
+		}
 	}
 
 	/**
@@ -159,7 +165,7 @@ public class Application extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.SET_PRIVACY_RULE);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		String classname = json.findPath("classname").textValue();
@@ -386,7 +392,7 @@ public class Application extends Controller {
 		}
 
 		StringUtil.printEnd(StringUtil.GET_OWL_FILE);
-		return ok(JsonUtil.getFalseJson());
+		return ok(JsonUtil.getFalseJson(1005));
 	}
 
 	/**
@@ -405,25 +411,25 @@ public class Application extends Controller {
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		if (uid == null || datachange == null || action == null) {
 			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
-		// if the rule is existed
-		if (Rule.find.where().icontains("datachange", datachange).findList()
-				.size() > 0) {
-			StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
-			return ok(JsonUtil.getFalseJson());
+		// if the rule is existed, try to reset it
+		Rule rule = Rule.find.where().eq("datachange", datachange)
+				.eq("uid", uid).findUnique();
+		if (rule != null) {
+			rule.action = action;
+		} else {
+			rule = new Rule();
+			rule.action = action;
+			rule.datachange = datachange;
+			rule.uid = uid;
 		}
-
-		Rule rule = new Rule();
-		rule.action = action;
-		rule.datachange = datachange;
-		rule.uid = uid;
 		rule.save();
 
 		StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
@@ -438,22 +444,17 @@ public class Application extends Controller {
 	public static Result getDataChangeRule(String uid) {
 		StringUtil.printStart(StringUtil.GET_DATA_CHANGE_RULE);
 		if (uid == null) {
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1006));
 		}
 
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
-			return ok(JsonUtil.getFalseJson());
+			return ok(JsonUtil.getFalseJson(1004));
 		}
 
 		List<Rule> list_rule = Rule.find.where().icontains("uid", uid)
 				.findList();
-		System.out.println(list_rule.size());
-		if (list_rule.size() <= 0) {
-			StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
-			return ok(JsonUtil.getFalseJson());
-		}
 
 		ObjectNode on = Json.newObject();
 
