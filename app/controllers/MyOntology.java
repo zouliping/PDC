@@ -339,6 +339,7 @@ public class MyOntology extends Controller {
 	 */
 	public static Result getRelatedClasses(String classname) {
 		StringUtil.printStart(StringUtil.GET_RELATED_CLASSES);
+
 		OntModel model = MyOntModel.getInstance().getModel();
 
 		// Get prefixes
@@ -347,8 +348,8 @@ public class MyOntology extends Controller {
 		String owlPrefix = model.getNsPrefixURI("owl");
 
 		OntClass oct = model.getOntClass(defaultPrefix + classname);
-		if (classname == null || oct == null) {
-			return ok(JsonUtil.getFalseJson(1006,
+		if (oct == null) {
+			return ok(JsonUtil.getFalseJson(1007,
 					StringUtil.GET_RELATED_CLASSES));
 		}
 

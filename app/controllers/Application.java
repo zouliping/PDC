@@ -128,12 +128,12 @@ public class Application extends Controller {
 
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(did)) {
-			return ok(JsonUtil.getFalseJson(1003,StringUtil.REGISTER_APP));
+			return ok(JsonUtil.getFalseJson(1003, StringUtil.REGISTER_APP));
 		}
 
 		Service service = Service.find.where().eq("name", sname).findUnique();
 		if (service != null) {
-			return ok(JsonUtil.getFalseJson(1008,StringUtil.REGISTER_APP));
+			return ok(JsonUtil.getFalseJson(1008, StringUtil.REGISTER_APP));
 		} else {
 			service = new Service();
 			service.name = sname;
@@ -160,7 +160,7 @@ public class Application extends Controller {
 
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
-			return ok(JsonUtil.getFalseJson(1004,StringUtil.SET_PRIVACY_RULE));
+			return ok(JsonUtil.getFalseJson(1004, StringUtil.SET_PRIVACY_RULE));
 		}
 
 		String classname = json.findPath("classname").textValue();
@@ -386,7 +386,7 @@ public class Application extends Controller {
 			e.printStackTrace();
 		}
 
-		return ok(JsonUtil.getFalseJson(1005,StringUtil.GET_OWL_FILE));
+		return ok(JsonUtil.getFalseJson(1005, StringUtil.GET_OWL_FILE));
 	}
 
 	/**
@@ -404,11 +404,13 @@ public class Application extends Controller {
 
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
-			return ok(JsonUtil.getFalseJson(1004,StringUtil.SET_DATA_CHANGE_RULE));
+			return ok(JsonUtil.getFalseJson(1004,
+					StringUtil.SET_DATA_CHANGE_RULE));
 		}
 
 		if (uid == null || datachange == null || action == null) {
-			return ok(JsonUtil.getFalseJson(1006,StringUtil.SET_DATA_CHANGE_RULE));
+			return ok(JsonUtil.getFalseJson(1006,
+					StringUtil.SET_DATA_CHANGE_RULE));
 		}
 
 		// if the rule is existed, try to reset it
@@ -435,13 +437,11 @@ public class Application extends Controller {
 	 */
 	public static Result getDataChangeRule(String uid) {
 		StringUtil.printStart(StringUtil.GET_DATA_CHANGE_RULE);
-		if (uid == null) {
-			return ok(JsonUtil.getFalseJson(1006,StringUtil.GET_DATA_CHANGE_RULE));
-		}
 
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
-			return ok(JsonUtil.getFalseJson(1004,StringUtil.GET_DATA_CHANGE_RULE));
+			return ok(JsonUtil.getFalseJson(1004,
+					StringUtil.GET_DATA_CHANGE_RULE));
 		}
 
 		List<Rule> list_rule = Rule.find.where().icontains("uid", uid)

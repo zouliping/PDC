@@ -141,6 +141,11 @@ public class MyIndividual extends Controller {
 		String id2 = json.findPath("id2").textValue();
 		String token = json.findPath("uid").textValue();
 
+		if (id1 == null || id2 == null || token == null) {
+			return ok(JsonUtil.getFalseJson(1006,
+					StringUtil.ADD_INDIVIDUAL_RELATION));
+		}
+
 		// if id is not existed individual name, classname will be null
 		String classname1 = ModelUtil.getClassname(id1);
 		String classname2 = ModelUtil.getClassname(id2);
@@ -152,7 +157,7 @@ public class MyIndividual extends Controller {
 		}
 
 		if (classname1 == null || classname2 == null) {
-			return ok(JsonUtil.getFalseJson(1006,
+			return ok(JsonUtil.getFalseJson(1007,
 					StringUtil.ADD_INDIVIDUAL_RELATION));
 		}
 
