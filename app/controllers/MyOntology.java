@@ -131,7 +131,7 @@ public class MyOntology extends Controller {
 		String classname = json.findPath("classname").textValue();
 		String token = json.findPath("did").textValue();
 
-		if (classname == null) {
+		if (classname == null || token == null) {
 			return ok(JsonUtil.getFalseJson(1006, StringUtil.ADD_CLASS));
 		}
 
@@ -175,7 +175,8 @@ public class MyOntology extends Controller {
 		String relation = json.findPath("relation").textValue();
 		String token = json.findPath("did").textValue();
 
-		if (class1 == null || class2 == null || relation == null) {
+		if (class1 == null || class2 == null || relation == null
+				|| token == null) {
 			return ok(JsonUtil
 					.getFalseJson(1006, StringUtil.ADD_CLASS_RELATION));
 		}
@@ -215,14 +216,14 @@ public class MyOntology extends Controller {
 	 * @param name
 	 * @return
 	 */
-	public static Result getLabel(String isclass, String name) {
+	public static Result getLabel(Boolean isclass, String name) {
 		StringUtil.printStart(StringUtil.GET_LABEL);
 		OntModel model = MyOntModel.getInstance().getModel();
 		String prefix = model.getNsPrefixURI("");
 		ArrayList<String> labelList = new ArrayList<String>();
 
 		// class label
-		if ("true".equals(isclass) || "TRUE".equals(isclass)) {
+		if (isclass) {
 			OntClass oc = model.getOntClass(prefix + name);
 
 			if (null == oc) {
@@ -239,7 +240,7 @@ public class MyOntology extends Controller {
 
 			StringUtil.printEnd(StringUtil.GET_LABEL);
 			return ok(JsonUtil.addList2Json("label", labelList));
-		} else if ("false".equals(isclass) || "FALSE".equals(isclass)) {
+		} else {
 			// property label
 			OntProperty op = model.getOntProperty(prefix + name);
 
@@ -257,8 +258,6 @@ public class MyOntology extends Controller {
 
 			StringUtil.printEnd(StringUtil.GET_LABEL);
 			return ok(JsonUtil.addList2Json("label", labelList));
-		} else {
-			return ok(JsonUtil.getFalseJson(1007, StringUtil.GET_LABEL));
 		}
 	}
 
@@ -274,6 +273,10 @@ public class MyOntology extends Controller {
 		Boolean isClass = json.path("isClass").asBoolean();
 		String name = json.findPath("name").textValue();
 		String token = json.findPath("did").textValue();
+
+		if (isClass == null || name == null || token == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.ADD_LABEL));
+		}
 
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(token)) {

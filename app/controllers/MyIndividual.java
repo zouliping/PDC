@@ -49,13 +49,13 @@ public class MyIndividual extends Controller {
 		String individualname = json.findPath("individualname").textValue();
 		String token = json.findPath("uid").textValue();
 
+		if (classname == null || individualname == null || token == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.UPDATE_INDIVIDUAL));
+		}
+
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(token)) {
 			return ok(JsonUtil.getFalseJson(1004, StringUtil.UPDATE_INDIVIDUAL));
-		}
-
-		if (classname == null || individualname == null) {
-			return ok(JsonUtil.getFalseJson(1006, StringUtil.UPDATE_INDIVIDUAL));
 		}
 
 		OntModel model = MyOntModel.getInstance().getModel();
@@ -218,14 +218,15 @@ public class MyIndividual extends Controller {
 		String relation = json.findPath("relation").textValue();
 		String token = json.findPath("uid").textValue();
 
-		// confirm whether user is correct
-		if (!UserUtil.confirmUser(token)) {
-			return ok(JsonUtil.getFalseJson(1004,
+		if (token == null || indivi1 == null || indivi2 == null
+				|| relation == null) {
+			return ok(JsonUtil.getFalseJson(1006,
 					StringUtil.REMOVE_INDIVIDUAL_RELATION));
 		}
 
-		if (indivi1 == null || indivi2 == null || relation == null) {
-			return ok(JsonUtil.getFalseJson(1006,
+		// confirm whether user is correct
+		if (!UserUtil.confirmUser(token)) {
+			return ok(JsonUtil.getFalseJson(1004,
 					StringUtil.REMOVE_INDIVIDUAL_RELATION));
 		}
 
@@ -502,6 +503,10 @@ public class MyIndividual extends Controller {
 
 		String uid = json.findPath("uid").textValue();
 
+		if (uid == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.GET_BY_LABEL));
+		}
+
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			return ok(JsonUtil.getFalseJson(1004, StringUtil.GET_BY_LABEL));
@@ -651,6 +656,10 @@ public class MyIndividual extends Controller {
 		String indivname = json.findPath("indivname").textValue();
 		String proname = json.findPath("proname").textValue();
 		String token = json.findPath("uid").textValue();
+
+		if (indivname == null || token == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.REMOVE_INDIVIDUAL));
+		}
 
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(token)) {

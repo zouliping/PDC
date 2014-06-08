@@ -52,6 +52,10 @@ public class Application extends Controller {
 		String pwd = json.findPath("password").textValue();
 		Boolean isDev = json.findPath("isDev").asBoolean();
 
+		if (uid == null || pwd == null || isDev == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.LOGIN));
+		}
+
 		Boolean success = false;
 
 		if (isDev) {
@@ -88,6 +92,10 @@ public class Application extends Controller {
 		System.out.println(json.toString());
 		String uid = json.findPath("u_id").textValue();
 		String pwd = json.findPath("u_password").textValue();
+
+		if (uid == null || pwd == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.REGISTER_USER));
+		}
 
 		// if the user is existed
 		if (Users.find.where().icontains("uid", uid).findList().size() > 0) {
@@ -126,6 +134,10 @@ public class Application extends Controller {
 		String sname = json.findPath("name").textValue();
 		String did = json.findPath("did").textValue();
 
+		if (sname == null || did == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.REGISTER_APP));
+		}
+
 		// confirm whether dev is correct
 		if (!UserUtil.confirmDev(did)) {
 			return ok(JsonUtil.getFalseJson(1003, StringUtil.REGISTER_APP));
@@ -158,6 +170,10 @@ public class Application extends Controller {
 
 		String uid = json.findPath("uid").textValue();
 
+		if (uid == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.SET_PRIVACY_RULE));
+		}
+
 		// confirm whether user is correct
 		if (!UserUtil.confirmUser(uid)) {
 			return ok(JsonUtil.getFalseJson(1004, StringUtil.SET_PRIVACY_RULE));
@@ -168,6 +184,10 @@ public class Application extends Controller {
 		Integer level = json.findPath("level").asInt();
 		JsonNode array = json.findPath("pro");
 		ArrayList<String> proList = new ArrayList<String>();
+
+		if (classname == null || allpro == null || level == null) {
+			return ok(JsonUtil.getFalseJson(1006, StringUtil.SET_PRIVACY_RULE));
+		}
 
 		// if set some properties
 		if (!allpro) {
@@ -402,14 +422,14 @@ public class Application extends Controller {
 		String datachange = json.findPath("datachange").textValue();
 		String action = json.findPath("action").textValue();
 
-		// confirm whether user is correct
-		if (!UserUtil.confirmUser(uid)) {
-			return ok(JsonUtil.getFalseJson(1004,
+		if (uid == null || datachange == null || action == null) {
+			return ok(JsonUtil.getFalseJson(1006,
 					StringUtil.SET_DATA_CHANGE_RULE));
 		}
 
-		if (uid == null || datachange == null || action == null) {
-			return ok(JsonUtil.getFalseJson(1006,
+		// confirm whether user is correct
+		if (!UserUtil.confirmUser(uid)) {
+			return ok(JsonUtil.getFalseJson(1004,
 					StringUtil.SET_DATA_CHANGE_RULE));
 		}
 
