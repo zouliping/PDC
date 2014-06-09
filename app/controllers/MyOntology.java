@@ -49,8 +49,10 @@ public class MyOntology extends Controller {
 			}
 		}
 
+		ObjectNode on = JsonUtil.addList2Json("classes", nameList);
+		System.out.println(on);
 		StringUtil.printEnd(StringUtil.GET_ALL_CHASSES);
-		return ok(JsonUtil.addList2Json("classes", nameList));
+		return ok(on);
 	}
 
 	/**
