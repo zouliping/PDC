@@ -2,6 +2,7 @@ package utils;
 
 import java.util.ArrayList;
 
+import play.Logger;
 import play.libs.Json;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -30,7 +31,7 @@ public class JsonUtil {
 	public static ObjectNode getFalseJson(Integer error, String title) {
 		ObjectNode result = Json.newObject();
 		result.put("result", error);
-		System.out.println(result);
+		Logger.info(result.toString());
 		StringUtil.printEnd(title);
 		return result;
 	}
@@ -52,7 +53,7 @@ public class JsonUtil {
 		}
 
 		result.putArray(key).addAll(an);
-		System.out.println(result);
+		Logger.info(result.toString());
 		StringUtil.printEnd(title);
 		return result;
 	}

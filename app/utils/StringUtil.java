@@ -1,5 +1,7 @@
 package utils;
 
+import play.Logger;
+
 public class StringUtil {
 	public static String STRING_NULL = "null";
 	public static String CLASSNAME_PREFIX = "http://www.w3.org/";
@@ -9,12 +11,12 @@ public class StringUtil {
 	public static String UPDATE_DATA = "update_";
 
 	public static void printStart(String title) {
-		System.out.println("******************** START OF " + title
+		Logger.info("******************** START OF " + title
 				+ " ********************");
 	}
 
 	public static void printEnd(String title) {
-		System.out.println("******************** END OF " + title
+		Logger.info("******************** END OF " + title
 				+ " **********************");
 	}
 
