@@ -159,8 +159,7 @@ public class MyOntology extends Controller {
 			MyOntModel.getInstance().updateModel(model);
 		}
 
-		StringUtil.printEnd(StringUtil.ADD_CLASS);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.ADD_CLASS));
 	}
 
 	/**
@@ -207,8 +206,7 @@ public class MyOntology extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
-		StringUtil.printEnd(StringUtil.ADD_CLASS_RELATION);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.ADD_CLASS_RELATION));
 	}
 
 	/**
@@ -332,8 +330,7 @@ public class MyOntology extends Controller {
 			}
 		}
 
-		StringUtil.printEnd(StringUtil.ADD_LABEL);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.ADD_LABEL));
 	}
 
 	/**

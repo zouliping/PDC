@@ -123,8 +123,7 @@ public class MyIndividual extends Controller {
 		System.out.println(on.toString());
 		UserUtil.sendNotificationToU(datachange, on, token);
 
-		StringUtil.printEnd(StringUtil.UPDATE_INDIVIDUAL);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.UPDATE_INDIVIDUAL));
 	}
 
 	/**
@@ -200,8 +199,7 @@ public class MyIndividual extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
-		StringUtil.printEnd(StringUtil.ADD_INDIVIDUAL_RELATION);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.ADD_INDIVIDUAL_RELATION));
 	}
 
 	/**
@@ -259,8 +257,7 @@ public class MyIndividual extends Controller {
 
 		MyOntModel.getInstance().updateModel(model);
 
-		StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL_RELATION);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.REMOVE_INDIVIDUAL_RELATION));
 	}
 
 	/**
@@ -693,8 +690,6 @@ public class MyIndividual extends Controller {
 		}
 		// update the model in db
 		MyOntModel.getInstance().updateModel(model);
-		System.out.println(JsonUtil.getTrueJson().toString());
-		StringUtil.printEnd(StringUtil.REMOVE_INDIVIDUAL);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.REMOVE_INDIVIDUAL));
 	}
 }

@@ -57,7 +57,6 @@ public class Application extends Controller {
 		}
 
 		Boolean success = false;
-
 		if (isDev) {
 			Dev dev = Dev.find.where().icontains("dname", uid).findUnique();
 			if (dev != null && dev.dpwd.equals(pwd)) {
@@ -74,6 +73,7 @@ public class Application extends Controller {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
 
+			System.out.println(on);
 			StringUtil.printEnd(StringUtil.LOGIN);
 			return ok(on);
 		} else {
@@ -118,8 +118,7 @@ public class Application extends Controller {
 		Iterator<String> it = json.fieldNames();
 		ModelUtil.addIndividualProperties(oUser, iUser, it, json);
 
-		StringUtil.printEnd(StringUtil.REGISTER_USER);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.REGISTER_USER));
 	}
 
 	/**
@@ -152,8 +151,7 @@ public class Application extends Controller {
 			service.token = SHA1.getSHA1String(sname);
 			service.save();
 
-			StringUtil.printEnd(StringUtil.REGISTER_APP);
-			return ok(JsonUtil.getTrueJson());
+			return ok(JsonUtil.getTrueJson(StringUtil.REGISTER_APP));
 		}
 	}
 
@@ -377,8 +375,7 @@ public class Application extends Controller {
 			}
 		}
 
-		StringUtil.printEnd(StringUtil.SET_PRIVACY_RULE);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.SET_PRIVACY_RULE));
 	}
 
 	/**
@@ -446,8 +443,7 @@ public class Application extends Controller {
 		}
 		rule.save();
 
-		StringUtil.printEnd(StringUtil.SET_DATA_CHANGE_RULE);
-		return ok(JsonUtil.getTrueJson());
+		return ok(JsonUtil.getTrueJson(StringUtil.SET_DATA_CHANGE_RULE));
 	}
 
 	/**

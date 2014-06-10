@@ -14,9 +14,11 @@ public class JsonUtil {
 	 * 
 	 * @return
 	 */
-	public static ObjectNode getTrueJson() {
+	public static ObjectNode getTrueJson(String title) {
 		ObjectNode result = Json.newObject();
 		result.put("result", true);
+		System.out.println(result);
+		StringUtil.printEnd(title);
 		return result;
 	}
 
