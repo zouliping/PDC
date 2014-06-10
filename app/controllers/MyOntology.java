@@ -49,10 +49,8 @@ public class MyOntology extends Controller {
 			}
 		}
 
-		ObjectNode on = JsonUtil.addList2Json("classes", nameList);
-		System.out.println(on);
-		StringUtil.printEnd(StringUtil.GET_ALL_CHASSES);
-		return ok(on);
+		return ok(JsonUtil.addList2Json("classes", nameList,
+				StringUtil.GET_ALL_CHASSES));
 	}
 
 	/**
@@ -69,10 +67,8 @@ public class MyOntology extends Controller {
 			return ok(JsonUtil.getFalseJson(1007,
 					StringUtil.GET_CLASS_PROPERTIES));
 		} else {
-			ObjectNode on = JsonUtil.addList2Json(classname, proList);
-			System.out.println(on);
-			StringUtil.printEnd(StringUtil.GET_CLASS_PROPERTIES);
-			return ok(on);
+			return ok(JsonUtil.addList2Json(classname, proList,
+					StringUtil.GET_CLASS_PROPERTIES));
 		}
 	}
 
@@ -238,8 +234,8 @@ public class MyOntology extends Controller {
 				labelList.add(tmp);
 			}
 
-			StringUtil.printEnd(StringUtil.GET_LABEL);
-			return ok(JsonUtil.addList2Json("label", labelList));
+			return ok(JsonUtil.addList2Json("label", labelList,
+					StringUtil.GET_LABEL));
 		} else {
 			// property label
 			OntProperty op = model.getOntProperty(prefix + name);
@@ -256,8 +252,8 @@ public class MyOntology extends Controller {
 				labelList.add(tmp);
 			}
 
-			StringUtil.printEnd(StringUtil.GET_LABEL);
-			return ok(JsonUtil.addList2Json("label", labelList));
+			return ok(JsonUtil.addList2Json("label", labelList,
+					StringUtil.GET_LABEL));
 		}
 	}
 
@@ -394,6 +390,7 @@ public class MyOntology extends Controller {
 			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			return ok(re);
 		} else {
+			System.out.println(StringUtil.STRING_NULL);
 			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			// if a class does not have related classes, return "null"
 			return ok(StringUtil.STRING_NULL);

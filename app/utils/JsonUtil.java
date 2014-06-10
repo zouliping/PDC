@@ -42,7 +42,8 @@ public class JsonUtil {
 	 * @param strList
 	 * @return
 	 */
-	public static ObjectNode addList2Json(String key, ArrayList<String> strList) {
+	public static ObjectNode addList2Json(String key,
+			ArrayList<String> strList, String title) {
 		ObjectNode result = Json.newObject();
 		ArrayNode an = result.arrayNode();
 
@@ -51,6 +52,8 @@ public class JsonUtil {
 		}
 
 		result.putArray(key).addAll(an);
+		System.out.println(result);
+		StringUtil.printEnd(title);
 		return result;
 	}
 

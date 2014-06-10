@@ -469,6 +469,7 @@ public class Application extends Controller {
 			on.put(rule.datachange, rule.action);
 		}
 
+		System.out.println(on);
 		StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
 		return ok(on);
 	}
