@@ -152,7 +152,8 @@ public class MyOntology extends Controller {
 				// attach a property to a class
 				op.addDomain(oc);
 			}
-			MyOntModel.getInstance().updateModel(model);
+			model.commit();
+			// MyOntModel.getInstance().updateModel(model);
 		}
 
 		return ok(JsonUtil.getTrueJson(StringUtil.ADD_CLASS));
@@ -200,7 +201,8 @@ public class MyOntology extends Controller {
 		op.setDomain(ontClass1);
 		op.setRange(ontClass2);
 
-		MyOntModel.getInstance().updateModel(model);
+		model.commit();
+		// MyOntModel.getInstance().updateModel(model);
 
 		return ok(JsonUtil.getTrueJson(StringUtil.ADD_CLASS_RELATION));
 	}
@@ -325,6 +327,7 @@ public class MyOntology extends Controller {
 				}
 			}
 		}
+		model.commit();
 
 		return ok(JsonUtil.getTrueJson(StringUtil.ADD_LABEL));
 	}

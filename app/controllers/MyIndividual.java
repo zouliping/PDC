@@ -197,7 +197,8 @@ public class MyIndividual extends Controller {
 		StatementImpl stmt = new StatementImpl(i1, op, i2);
 		model.add(stmt);
 
-		MyOntModel.getInstance().updateModel(model);
+		model.commit();
+		// MyOntModel.getInstance().updateModel(model);
 
 		return ok(JsonUtil.getTrueJson(StringUtil.ADD_INDIVIDUAL_RELATION));
 	}
@@ -255,7 +256,8 @@ public class MyIndividual extends Controller {
 			}
 		}
 
-		MyOntModel.getInstance().updateModel(model);
+		model.commit();
+		// MyOntModel.getInstance().updateModel(model);
 
 		return ok(JsonUtil.getTrueJson(StringUtil.REMOVE_INDIVIDUAL_RELATION));
 	}
@@ -689,7 +691,8 @@ public class MyIndividual extends Controller {
 			}
 		}
 		// update the model in db
-		MyOntModel.getInstance().updateModel(model);
+		model.commit();
+		// MyOntModel.getInstance().updateModel(model);
 		return ok(JsonUtil.getTrueJson(StringUtil.REMOVE_INDIVIDUAL));
 	}
 }

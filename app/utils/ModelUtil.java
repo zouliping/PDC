@@ -169,7 +169,8 @@ public class ModelUtil {
 			}
 		}
 
-		MyOntModel.getInstance().updateModel(model);
+		// MyOntModel.getInstance().updateModel(model);
+		model.commit();
 		return true;
 	}
 
@@ -201,7 +202,8 @@ public class ModelUtil {
 				}
 			}
 		}
-		MyOntModel.getInstance().updateModel(model);
+		model.commit();
+		// MyOntModel.getInstance().updateModel(model);
 		return true;
 	}
 
