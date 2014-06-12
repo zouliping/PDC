@@ -18,7 +18,7 @@ public class JsonUtil {
 	public static ObjectNode getTrueJson(String title) {
 		ObjectNode result = Json.newObject();
 		result.put("result", true);
-		System.out.println(result);
+		Logger.info(result.toString());
 		StringUtil.printEnd(title);
 		return result;
 	}
