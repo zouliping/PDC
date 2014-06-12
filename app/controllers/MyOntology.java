@@ -3,6 +3,7 @@ package controllers;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -24,6 +25,14 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+/**
+ * Ontology API. Including: Get All Classes, Get A Class' Properties, Get
+ * Relation, Add Relation, Get Labels, Add Labels, Add A Class, Get Related
+ * Classes. 8
+ * 
+ * @author zouliping
+ * 
+ */
 public class MyOntology extends Controller {
 
 	private static OntModel model;
@@ -112,7 +121,7 @@ public class MyOntology extends Controller {
 		ObjectNode on = Json.newObject();
 		on.put("relation", relationValue);
 
-		System.out.println(on);
+		Logger.info(on.toString());
 		StringUtil.printEnd(StringUtil.GET_CLASS_RELATION);
 		return ok(on);
 	}
@@ -125,7 +134,7 @@ public class MyOntology extends Controller {
 	public static Result add() {
 		StringUtil.printStart(StringUtil.ADD_CLASS);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		String classname = json.findPath("classname").textValue();
 		String token = json.findPath("did").textValue();
 
@@ -167,7 +176,7 @@ public class MyOntology extends Controller {
 	public static Result addRelation() {
 		StringUtil.printStart(StringUtil.ADD_CLASS_RELATION);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		String class1 = json.findPath("class1").textValue();
 		String class2 = json.findPath("class2").textValue();
 		String relation = json.findPath("relation").textValue();
@@ -267,7 +276,7 @@ public class MyOntology extends Controller {
 	public static Result addLabel() {
 		StringUtil.printStart(StringUtil.ADD_LABEL);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		Boolean isClass = json.path("isClass").asBoolean();
 		String name = json.findPath("name").textValue();
 		String token = json.findPath("did").textValue();
@@ -389,11 +398,11 @@ public class MyOntology extends Controller {
 		QueryUtil.closeQE();
 
 		if (haveResult) {
-			System.out.println(re);
+			Logger.info(re.toString());
 			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			return ok(re);
 		} else {
-			System.out.println(StringUtil.STRING_NULL);
+			Logger.info(StringUtil.STRING_NULL);
 			StringUtil.printEnd(StringUtil.GET_RELATED_CLASSES);
 			// if a class does not have related classes, return "null"
 			return ok(StringUtil.STRING_NULL);

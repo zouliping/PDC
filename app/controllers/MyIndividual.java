@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,6 +34,14 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+/**
+ * Instance API. Including: Update Individual, Get Individuals, Get Individual's
+ * Properties, Add Relation, Remove Relation, Remove A Individual, Get
+ * Individuals By Labels. 7
+ * 
+ * @author zouliping
+ * 
+ */
 public class MyIndividual extends Controller {
 
 	/**
@@ -43,7 +52,7 @@ public class MyIndividual extends Controller {
 	public static Result update() {
 		StringUtil.printStart(StringUtil.UPDATE_INDIVIDUAL);
 		JsonNode json = request().body().asJson();
-		System.out.println(json);
+		Logger.info(json.toString());
 
 		String classname = json.findPath("classname").textValue();
 		String individualname = json.findPath("individualname").textValue();
@@ -64,7 +73,7 @@ public class MyIndividual extends Controller {
 		Long a = System.currentTimeMillis();
 		OntClass oc = model.getOntClass(prefix + classname);
 		Long b = System.currentTimeMillis();
-		System.out.println("get ont class time " + (b - a));
+		Logger.info("get ont class time " + (b - a));
 
 		if (oc == null) {
 			return ok(JsonUtil.getFalseJson(1007, StringUtil.UPDATE_INDIVIDUAL));
@@ -120,7 +129,7 @@ public class MyIndividual extends Controller {
 		on.put("datachange", datachange);
 		on.put("indivname", individualname);
 
-		System.out.println(on.toString());
+		Logger.info(on.toString());
 		UserUtil.sendNotificationToU(datachange, on, token);
 
 		return ok(JsonUtil.getTrueJson(StringUtil.UPDATE_INDIVIDUAL));
@@ -134,7 +143,7 @@ public class MyIndividual extends Controller {
 	public static Result addRelation() {
 		StringUtil.printStart(StringUtil.ADD_INDIVIDUAL_RELATION);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 
 		String id1 = json.findPath("id1").textValue();
 		String id2 = json.findPath("id2").textValue();
@@ -211,7 +220,7 @@ public class MyIndividual extends Controller {
 	public static Result removeRelation() {
 		StringUtil.printStart(StringUtil.REMOVE_INDIVIDUAL_RELATION);
 		JsonNode json = request().body().asJson();
-		System.out.println(json);
+		Logger.info(json.toString());
 		String indivi1 = json.findPath("indiv1").textValue();
 		String indivi2 = json.findPath("indiv2").textValue();
 		String relation = json.findPath("relation").textValue();
@@ -273,8 +282,7 @@ public class MyIndividual extends Controller {
 		StringUtil.printStart(StringUtil.GET_INDIVIDUALS);
 		ArrayList<String> list_privacy_pro = new PrivacyInterpreter(uid, uname,
 				sid, classname).checkRules();
-		System.out
-				.println(classname + " public pro " + list_privacy_pro.size());
+		Logger.info(classname + " public pro " + list_privacy_pro.size());
 		// for (String tmp : list_privacy_pro) {
 		// System.out.println(tmp);
 		// }
@@ -405,7 +413,7 @@ public class MyIndividual extends Controller {
 			}
 		}
 
-		System.out.println(on);
+		Logger.info(on.toString());
 		StringUtil.printEnd(StringUtil.GET_INDIVIDUALS);
 		return ok(on);
 	}
@@ -485,7 +493,7 @@ public class MyIndividual extends Controller {
 			}
 		}
 
-		System.out.println(on);
+		Logger.info(on.toString());
 		StringUtil.printEnd(StringUtil.GET_INDIVIDUAL_PROPERTY);
 		return ok(on);
 	}
@@ -498,7 +506,7 @@ public class MyIndividual extends Controller {
 	public static Result getIndivByLabel() {
 		StringUtil.printStart(StringUtil.GET_BY_LABEL);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 
 		String uid = json.findPath("uid").textValue();
 
@@ -637,7 +645,7 @@ public class MyIndividual extends Controller {
 		}
 
 		QueryUtil.closeQE();
-		System.out.println(re);
+		Logger.info(re.toString());
 		StringUtil.printEnd(StringUtil.GET_BY_LABEL);
 		return ok(re);
 	}
@@ -651,7 +659,7 @@ public class MyIndividual extends Controller {
 	public static Result remove() {
 		StringUtil.printStart(StringUtil.REMOVE_INDIVIDUAL);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		String indivname = json.findPath("indivname").textValue();
 		String proname = json.findPath("proname").textValue();
 		String token = json.findPath("uid").textValue();
@@ -675,11 +683,11 @@ public class MyIndividual extends Controller {
 
 		// if user do not set property name, delete the individual
 		if (proname == null) {
-			System.out.println("before remove");
+			Logger.info("before remove");
 			Long a = System.currentTimeMillis();
 			i.remove();
 			Long b = System.currentTimeMillis();
-			System.out.println("after remove and use " + (b - a));
+			Logger.info("after remove and use " + (b - a));
 		} else {
 			// if user sets property name, delete the property
 			OntProperty op = model.getOntProperty(prefix + proname);

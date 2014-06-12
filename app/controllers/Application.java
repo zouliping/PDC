@@ -16,6 +16,7 @@ import models.RulesFriends;
 import models.RulesServices;
 import models.Service;
 import models.Users;
+import play.Logger;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,6 +34,14 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 
+/**
+ * Basic API. Including: Login, User Registration, Service Registration, Set
+ * Privacy Rules, Set Data Change Rules, Get Data Change Rules , OWL File
+ * Getting. 7
+ * 
+ * @author zouliping
+ * 
+ */
 public class Application extends Controller {
 
 	public static Result index() {
@@ -47,7 +56,7 @@ public class Application extends Controller {
 	public static Result login() {
 		StringUtil.printStart(StringUtil.LOGIN);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		String uid = json.findPath("id").textValue();
 		String pwd = json.findPath("password").textValue();
 		Boolean isDev = json.findPath("isDev").asBoolean();
@@ -73,7 +82,7 @@ public class Application extends Controller {
 			ObjectNode on = Json.newObject();
 			on.put("result", SHA1.getSHA1String(uid));
 
-			System.out.println(on);
+			Logger.info(on.toString());
 			StringUtil.printEnd(StringUtil.LOGIN);
 			return ok(on);
 		} else {
@@ -89,7 +98,7 @@ public class Application extends Controller {
 	public static Result registerUser() {
 		StringUtil.printStart(StringUtil.REGISTER_USER);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		String uid = json.findPath("u_id").textValue();
 		String pwd = json.findPath("u_password").textValue();
 
@@ -129,7 +138,7 @@ public class Application extends Controller {
 	public static Result registerApp() {
 		StringUtil.printStart(StringUtil.REGISTER_APP);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 		String sname = json.findPath("name").textValue();
 		String did = json.findPath("did").textValue();
 
@@ -164,7 +173,7 @@ public class Application extends Controller {
 	public static Result setRules() {
 		StringUtil.printStart(StringUtil.SET_PRIVACY_RULE);
 		JsonNode json = request().body().asJson();
-		System.out.println(json.toString());
+		Logger.info(json.toString());
 
 		String uid = json.findPath("uid").textValue();
 
@@ -414,7 +423,7 @@ public class Application extends Controller {
 	public static Result setDataChangeRule() {
 		StringUtil.printStart(StringUtil.SET_DATA_CHANGE_RULE);
 		JsonNode json = request().body().asJson();
-		System.out.println(json);
+		Logger.info(json.toString());
 		String uid = json.findPath("uid").textValue();
 		String datachange = json.findPath("datachange").textValue();
 		String action = json.findPath("action").textValue();
@@ -469,7 +478,7 @@ public class Application extends Controller {
 			on.put(rule.datachange, rule.action);
 		}
 
-		System.out.println(on);
+		Logger.info(on.toString());
 		StringUtil.printEnd(StringUtil.GET_DATA_CHANGE_RULE);
 		return ok(on);
 	}
